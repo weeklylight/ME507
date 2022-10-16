@@ -543,6 +543,52 @@ Content created by various authors including CR, JR, cadsoft.de, and adafruit.co
 <text x="-1.016" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="1" x="-2.54" y="0" visible="pad" length="short" direction="pas"/>
 </symbol>
+<symbol name="KEEYEES_ESP32">
+<pin name="3V3_OUT" x="-27.94" y="25.4" length="middle" direction="pwr"/>
+<pin name="!RST!/EN" x="-27.94" y="22.86" length="middle" direction="in"/>
+<pin name="ADC0/GPIO36" x="-27.94" y="20.32" length="middle"/>
+<pin name="ADC3/GPIO39" x="-27.94" y="17.78" length="middle"/>
+<pin name="ADC6/GPIO34" x="-27.94" y="15.24" length="middle"/>
+<pin name="ADC7/GPIO35" x="-27.94" y="12.7" length="middle"/>
+<pin name="ADC4/GPIO32" x="-27.94" y="10.16" length="middle"/>
+<pin name="ADC5/GPIO33" x="-27.94" y="7.62" length="middle"/>
+<pin name="ADC18/GPIO25" x="-27.94" y="5.08" length="middle"/>
+<pin name="ADC19/GPIO26" x="-27.94" y="2.54" length="middle"/>
+<pin name="ADC17/GPIO27" x="-27.94" y="0" length="middle"/>
+<pin name="ADC16/GPIO14" x="-27.94" y="-2.54" length="middle"/>
+<pin name="ADC15/GPIO12" x="-27.94" y="-5.08" length="middle"/>
+<pin name="GND@0" x="-27.94" y="-7.62" length="middle" direction="pwr"/>
+<pin name="ADC14/GPIO13" x="-27.94" y="-10.16" length="middle"/>
+<pin name="SD_D2/GPIO9" x="-27.94" y="-12.7" length="middle"/>
+<pin name="SD_D3/GPIO10" x="-27.94" y="-15.24" length="middle"/>
+<pin name="SD_CMD/GPIO11" x="-27.94" y="-17.78" length="middle"/>
+<pin name="5V_IN" x="-27.94" y="-20.32" length="middle" direction="pwr"/>
+<pin name="GND@1" x="22.86" y="25.4" length="middle" direction="pwr" rot="R180"/>
+<pin name="MOSI/GPIO23" x="22.86" y="22.86" length="middle" rot="R180"/>
+<pin name="SCL/GPIO22" x="22.86" y="20.32" length="middle" rot="R180"/>
+<pin name="TX0/GPIO1" x="22.86" y="17.78" length="middle" rot="R180"/>
+<pin name="RX0/GPIO3" x="22.86" y="15.24" length="middle" rot="R180"/>
+<pin name="SDA/GPIO21" x="22.86" y="12.7" length="middle" rot="R180"/>
+<pin name="GND@2" x="22.86" y="10.16" length="middle" direction="pwr" rot="R180"/>
+<pin name="MISO/GPIO19" x="22.86" y="7.62" length="middle" rot="R180"/>
+<pin name="SCK/GPIO18" x="22.86" y="5.08" length="middle" rot="R180"/>
+<pin name="!SS!/GPIO5" x="22.86" y="2.54" length="middle" rot="R180"/>
+<pin name="TX2/GPIO17" x="22.86" y="0" length="middle" rot="R180"/>
+<pin name="RX2/GPIO16" x="22.86" y="-2.54" length="middle" rot="R180"/>
+<pin name="ADC10/GPIO4" x="22.86" y="-5.08" length="middle" rot="R180"/>
+<pin name="ADC12/GPIO2" x="22.86" y="-10.16" length="middle" rot="R180"/>
+<pin name="ADC11/GPIO0" x="22.86" y="-7.62" length="middle" rot="R180"/>
+<pin name="ADC13/GPIO15" x="22.86" y="-12.7" length="middle" rot="R180"/>
+<pin name="SD_D1/GPIO8" x="22.86" y="-15.24" length="middle" rot="R180"/>
+<pin name="SD_D0/GPIO7" x="22.86" y="-17.78" length="middle" rot="R180"/>
+<pin name="SD_CK/GPIO6" x="22.86" y="-20.32" length="middle" rot="R180"/>
+<wire x1="-22.86" y1="27.94" x2="-22.86" y2="-22.86" width="0.254" layer="94"/>
+<wire x1="-22.86" y1="-22.86" x2="17.78" y2="-22.86" width="0.254" layer="94"/>
+<wire x1="17.78" y1="-22.86" x2="17.78" y2="27.94" width="0.254" layer="94"/>
+<wire x1="17.78" y1="27.94" x2="-22.86" y2="27.94" width="0.254" layer="94"/>
+<text x="-22.86" y="30.48" size="2.1844" layer="94">&gt;NAME</text>
+<text x="-7.62" y="30.48" size="2.1844" layer="94">KeeYees ESP32</text>
+</symbol>
 <symbol name="FRAME_LET_L">
 <frame x1="0" y1="0" x2="254" y2="190.5" columns="6" rows="5" layer="94" border-bottom="no"/>
 </symbol>
@@ -601,52 +647,6 @@ Content created by various authors including CR, JR, cadsoft.de, and adafruit.co
 <wire x1="139.7" y1="35.56" x2="139.7" y2="0" width="0.1016" layer="94"/>
 <wire x1="139.7" y1="35.56" x2="0" y2="35.56" width="0.1016" layer="94"/>
 <text x="2.54" y="30.48" size="2.54" layer="94">Notes:</text>
-</symbol>
-<symbol name="KEEYEES_ESP32">
-<pin name="3V3_OUT" x="-27.94" y="25.4" length="middle" direction="pwr"/>
-<pin name="!RST!/EN" x="-27.94" y="22.86" length="middle" direction="in"/>
-<pin name="ADC0/GPIO36" x="-27.94" y="20.32" length="middle"/>
-<pin name="ADC3/GPIO39" x="-27.94" y="17.78" length="middle"/>
-<pin name="ADC6/GPIO34" x="-27.94" y="15.24" length="middle"/>
-<pin name="ADC7/GPIO35" x="-27.94" y="12.7" length="middle"/>
-<pin name="ADC4/GPIO32" x="-27.94" y="10.16" length="middle"/>
-<pin name="ADC5/GPIO33" x="-27.94" y="7.62" length="middle"/>
-<pin name="ADC18/GPIO25" x="-27.94" y="5.08" length="middle"/>
-<pin name="ADC19/GPIO26" x="-27.94" y="2.54" length="middle"/>
-<pin name="ADC17/GPIO27" x="-27.94" y="0" length="middle"/>
-<pin name="ADC16/GPIO14" x="-27.94" y="-2.54" length="middle"/>
-<pin name="ADC15/GPIO12" x="-27.94" y="-5.08" length="middle"/>
-<pin name="GND@0" x="-27.94" y="-7.62" length="middle" direction="pwr"/>
-<pin name="ADC14/GPIO13" x="-27.94" y="-10.16" length="middle"/>
-<pin name="SD_D2/GPIO9" x="-27.94" y="-12.7" length="middle"/>
-<pin name="SD_D3/GPIO10" x="-27.94" y="-15.24" length="middle"/>
-<pin name="SD_CMD/GPIO11" x="-27.94" y="-17.78" length="middle"/>
-<pin name="5V_IN" x="-27.94" y="-20.32" length="middle" direction="pwr"/>
-<pin name="GND@1" x="22.86" y="25.4" length="middle" direction="pwr" rot="R180"/>
-<pin name="MOSI/GPIO23" x="22.86" y="22.86" length="middle" rot="R180"/>
-<pin name="SCL/GPIO22" x="22.86" y="20.32" length="middle" rot="R180"/>
-<pin name="TX0/GPIO1" x="22.86" y="17.78" length="middle" rot="R180"/>
-<pin name="RX0/GPIO3" x="22.86" y="15.24" length="middle" rot="R180"/>
-<pin name="SDA/GPIO21" x="22.86" y="12.7" length="middle" rot="R180"/>
-<pin name="GND@2" x="22.86" y="10.16" length="middle" direction="pwr" rot="R180"/>
-<pin name="MISO/GPIO19" x="22.86" y="7.62" length="middle" rot="R180"/>
-<pin name="SCK/GPIO18" x="22.86" y="5.08" length="middle" rot="R180"/>
-<pin name="!SS!/GPIO5" x="22.86" y="2.54" length="middle" rot="R180"/>
-<pin name="TX2/GPIO17" x="22.86" y="0" length="middle" rot="R180"/>
-<pin name="RX2/GPIO16" x="22.86" y="-2.54" length="middle" rot="R180"/>
-<pin name="ADC10/GPIO4" x="22.86" y="-5.08" length="middle" rot="R180"/>
-<pin name="ADC12/GPIO2" x="22.86" y="-10.16" length="middle" rot="R180"/>
-<pin name="ADC11/GPIO0" x="22.86" y="-7.62" length="middle" rot="R180"/>
-<pin name="ADC13/GPIO15" x="22.86" y="-12.7" length="middle" rot="R180"/>
-<pin name="SD_D1/GPIO8" x="22.86" y="-15.24" length="middle" rot="R180"/>
-<pin name="SD_D0/GPIO7" x="22.86" y="-17.78" length="middle" rot="R180"/>
-<pin name="SD_CK/GPIO6" x="22.86" y="-20.32" length="middle" rot="R180"/>
-<wire x1="-22.86" y1="27.94" x2="-22.86" y2="-22.86" width="0.254" layer="94"/>
-<wire x1="-22.86" y1="-22.86" x2="17.78" y2="-22.86" width="0.254" layer="94"/>
-<wire x1="17.78" y1="-22.86" x2="17.78" y2="27.94" width="0.254" layer="94"/>
-<wire x1="17.78" y1="27.94" x2="-22.86" y2="27.94" width="0.254" layer="94"/>
-<text x="-22.86" y="30.48" size="2.1844" layer="94">&gt;NAME</text>
-<text x="-7.62" y="30.48" size="2.1844" layer="94">KeeYees ESP32</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -805,21 +805,6 @@ Larger versions can carry more current.</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="TITLEBLOCK_LET_L" prefix="FRAME" uservalue="yes">
-<description>&lt;b&gt;FRAME&lt;/b&gt; A Size , 8 1/2 x 11 INCH, Landscape&lt;p&gt;</description>
-<gates>
-<gate name="G$1" symbol="FRAME_LET_L" x="0" y="0" addlevel="always"/>
-<gate name="G$2" symbol="DOCFIELD" x="147.32" y="0" addlevel="always"/>
-<gate name="G$3" symbol="NOTES" x="5.08" y="0"/>
-</gates>
-<devices>
-<device name="">
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="SCREWTERM_4P" prefix="X" uservalue="yes">
 <description>&lt;b&gt;Screw Terminal Block&lt;/b&gt;
 &lt;p&gt;
@@ -961,6 +946,21 @@ Larger versions can carry more current.</description>
 <connect gate="G$1" pin="TX0/GPIO1" pad="P35"/>
 <connect gate="G$1" pin="TX2/GPIO17" pad="P28"/>
 </connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="TITLEBLOCK_LET_L" prefix="FRAME" uservalue="yes">
+<description>&lt;b&gt;FRAME&lt;/b&gt; A Size , 8 1/2 x 11 INCH, Landscape&lt;p&gt;</description>
+<gates>
+<gate name="G$1" symbol="FRAME_LET_L" x="0" y="0" addlevel="always"/>
+<gate name="G$2" symbol="DOCFIELD" x="147.32" y="0" addlevel="always"/>
+<gate name="G$3" symbol="NOTES" x="5.08" y="0"/>
+</gates>
+<devices>
+<device name="">
 <technologies>
 <technology name=""/>
 </technologies>
@@ -1414,6 +1414,9 @@ Added bigger pads to the TO-92 package</description>
 </library>
 </libraries>
 <attributes>
+<attribute name="AUTHOR" value="Alexander Dunn"/>
+<attribute name="BOARD_NAME" value="Satellite Platform Schematic"/>
+<attribute name="PROJECT_NAME" value="ME 507 Project"/>
 </attributes>
 <variantdefs>
 </variantdefs>
@@ -1438,7 +1441,6 @@ Added bigger pads to the TO-92 package</description>
 <part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="IC1" library="A4990KLPTR-T" deviceset="A4990KLPTR-T" device=""/>
 <part name="IC2" library="A4990KLPTR-T" deviceset="A4990KLPTR-T" device=""/>
-<part name="FRAME1" library="ME507" deviceset="TITLEBLOCK_LET_L" device=""/>
 <part name="IC3" library="adafruit" deviceset="78*" device="T" technology="05"/>
 <part name="X5" library="ME507" deviceset="SCREWTERM_3P" device="_254"/>
 <part name="X6" library="ME507" deviceset="SCREWTERM_3P" device="_254"/>
@@ -1456,6 +1458,7 @@ Added bigger pads to the TO-92 package</description>
 <part name="P+1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="VCC" device=""/>
 <part name="GND7" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="VCC" device=""/>
+<part name="FRAME1" library="ME507" deviceset="TITLEBLOCK_LET_L" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -1539,13 +1542,6 @@ Added bigger pads to the TO-92 package</description>
 <instance part="IC2" gate="G$1" x="-45.72" y="10.16" smashed="yes">
 <attribute name="NAME" x="-16.51" y="17.78" size="1.778" layer="95" align="center-left"/>
 <attribute name="VALUE" x="-16.51" y="15.24" size="1.778" layer="96" align="center-left"/>
-</instance>
-<instance part="FRAME1" gate="G$3" x="-93.98" y="-55.88" smashed="yes"/>
-<instance part="FRAME1" gate="G$1" x="-99.06" y="-55.88" smashed="yes"/>
-<instance part="FRAME1" gate="G$2" x="48.26" y="-55.88" smashed="yes">
-<attribute name="LAST_DATE_TIME" x="60.96" y="-44.45" size="2.54" layer="94"/>
-<attribute name="SHEET" x="90.17" y="-49.53" size="2.54" layer="94"/>
-<attribute name="DRAWING_NAME" x="141.605" y="-52.07" size="2.54" layer="94" align="bottom-right"/>
 </instance>
 <instance part="IC3" gate="A1" x="-33.02" y="111.76" smashed="yes">
 <attribute name="NAME" x="-40.64" y="117.475" size="1.778" layer="95"/>
@@ -1648,6 +1644,16 @@ Added bigger pads to the TO-92 package</description>
 </instance>
 <instance part="P+2" gate="VCC" x="-63.5" y="91.44" smashed="yes">
 <attribute name="VALUE" x="-66.04" y="88.9" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="FRAME1" gate="G$3" x="-99.06" y="-58.42" smashed="yes"/>
+<instance part="FRAME1" gate="G$1" x="-104.14" y="-58.42" smashed="yes"/>
+<instance part="FRAME1" gate="G$2" x="43.18" y="-58.42" smashed="yes">
+<attribute name="LAST_DATE_TIME" x="55.88" y="-46.99" size="2.54" layer="94"/>
+<attribute name="SHEET" x="85.09" y="-52.07" size="2.54" layer="94"/>
+<attribute name="DRAWING_NAME" x="136.525" y="-54.61" size="2.54" layer="94" align="bottom-right"/>
+<attribute name="PROJECT_NAME" x="60.96" y="-27.94" size="2.54" layer="94"/>
+<attribute name="AUTHOR" x="66.04" y="-41.91" size="2.54" layer="94"/>
+<attribute name="BOARD_NAME" x="55.88" y="-35.56" size="2.54" layer="94"/>
 </instance>
 </instances>
 <busses>
