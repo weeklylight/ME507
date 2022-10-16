@@ -9068,6 +9068,86 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="MBRM140T3G">
+<packages>
+<package name="DIO_MBRM110LT1G">
+<wire x1="-1.96" y1="1" x2="0" y2="1" width="0.127" layer="51"/>
+<wire x1="0" y1="1" x2="0" y2="0.18" width="0.127" layer="51"/>
+<wire x1="0" y1="0.18" x2="0" y2="-0.18" width="0.127" layer="51"/>
+<wire x1="0" y1="-0.18" x2="0" y2="-1" width="0.127" layer="51"/>
+<wire x1="0" y1="-1" x2="-1.96" y2="-1" width="0.127" layer="51"/>
+<wire x1="-1.96" y1="-1" x2="-1.96" y2="-0.425" width="0.127" layer="51"/>
+<wire x1="-1.96" y1="-0.425" x2="-1.96" y2="0.425" width="0.127" layer="51"/>
+<wire x1="-1.96" y1="0.425" x2="-1.96" y2="1" width="0.127" layer="51"/>
+<wire x1="-1.96" y1="0.425" x2="-2.46" y2="0.425" width="0.127" layer="51"/>
+<wire x1="-2.46" y1="0.425" x2="-2.46" y2="-0.425" width="0.127" layer="51"/>
+<wire x1="-2.46" y1="-0.425" x2="-1.96" y2="-0.425" width="0.127" layer="51"/>
+<wire x1="0" y1="0.18" x2="0.635" y2="0.18" width="0.127" layer="51"/>
+<wire x1="0.635" y1="0.18" x2="1.35" y2="0.18" width="0.127" layer="51"/>
+<wire x1="1.35" y1="0.18" x2="1.35" y2="-0.18" width="0.127" layer="51"/>
+<wire x1="1.35" y1="-0.18" x2="0.635" y2="-0.18" width="0.127" layer="51"/>
+<wire x1="0.635" y1="-0.18" x2="0" y2="-0.18" width="0.127" layer="51"/>
+<wire x1="0.635" y1="0.18" x2="0.635" y2="-0.18" width="0.127" layer="51"/>
+<wire x1="-2.8" y1="1.5" x2="0.35" y2="1.5" width="0.05" layer="39"/>
+<wire x1="0.35" y1="1.5" x2="0.35" y2="0.9" width="0.05" layer="39"/>
+<wire x1="0.35" y1="0.9" x2="1.75" y2="0.9" width="0.05" layer="39"/>
+<wire x1="1.75" y1="0.9" x2="1.75" y2="-0.9" width="0.05" layer="39"/>
+<wire x1="1.75" y1="-0.9" x2="0.35" y2="-0.9" width="0.05" layer="39"/>
+<wire x1="0.35" y1="-0.9" x2="0.35" y2="-1.5" width="0.05" layer="39"/>
+<wire x1="0.35" y1="-1.5" x2="-2.8" y2="-1.5" width="0.05" layer="39"/>
+<wire x1="-2.8" y1="-1.5" x2="-2.8" y2="1.5" width="0.05" layer="39"/>
+<text x="-2.8055" y="1.452840625" size="1.272490625" layer="25">&gt;NAME</text>
+<text x="-2.80735" y="-2.75721875" size="1.27333125" layer="27">&gt;VALUE</text>
+<smd name="1" x="-1.235" y="0" dx="2.67" dy="2.54" layer="1"/>
+<smd name="2" x="1.116" y="0" dx="0.762" dy="1.27" layer="1"/>
+</package>
+</packages>
+<symbols>
+<symbol name="MBRM140T3G">
+<wire x1="-1.27" y1="-1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="-1.27" y2="1.27" width="0.254" layer="94"/>
+<wire x1="1.905" y1="1.27" x2="1.27" y2="1.27" width="0.254" layer="94"/>
+<wire x1="1.27" y1="1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="-1.27" y1="1.27" x2="-1.27" y2="-1.27" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="1.27" y2="-1.27" width="0.254" layer="94"/>
+<wire x1="1.905" y1="1.27" x2="1.905" y2="1.016" width="0.254" layer="94"/>
+<wire x1="1.27" y1="-1.27" x2="0.635" y2="-1.27" width="0.254" layer="94"/>
+<wire x1="0.635" y1="-1.016" x2="0.635" y2="-1.27" width="0.254" layer="94"/>
+<text x="-2.289909375" y="1.90826875" size="1.781040625" layer="95">&gt;NAME</text>
+<text x="-2.29023125" y="-3.43535" size="1.7813" layer="96">&gt;VALUE</text>
+<wire x1="-2.54" y1="0" x2="2.54" y2="0" width="0.254" layer="94"/>
+<pin name="A" x="-5.08" y="0" visible="pad" length="short" direction="pas"/>
+<pin name="C" x="5.08" y="0" visible="pad" length="short" direction="pas" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="MBRM140T3G">
+<description> &lt;a href="https://pricing.snapeda.com/parts/MBRM140T3G/ON%20Semiconductor/view-part?ref=eda"&gt;Check availability&lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="MBRM140T3G" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="DIO_MBRM110LT1G">
+<connects>
+<connect gate="G$1" pin="A" pad="2"/>
+<connect gate="G$1" pin="C" pad="1"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="AVAILABILITY" value="In Stock"/>
+<attribute name="DESCRIPTION" value=" Diode Schottky 40 V 1A Surface Mount Powermite "/>
+<attribute name="MF" value="ON Semiconductor"/>
+<attribute name="MP" value="MBRM140T3G"/>
+<attribute name="PACKAGE" value="POWERMITE-2 ON Semiconductor"/>
+<attribute name="PRICE" value="None"/>
+<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/MBRM140T3G/?ref=eda"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 <attribute name="AUTHOR" value="Alexander Dunn"/>
@@ -9132,6 +9212,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="GND10" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="FRAME1" library="ME507" deviceset="TITLEBLOCK_TAB_L" device=""/>
 <part name="FRAME2" library="ME507" deviceset="TITLEBLOCK_TAB_L" device=""/>
+<part name="U$2" library="MBRM140T3G" deviceset="MBRM140T3G" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -9364,6 +9445,10 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <attribute name="PROJECT_NAME" x="207.01" y="-35.56" size="2.54" layer="94"/>
 <attribute name="AUTHOR" x="212.09" y="-49.53" size="2.54" layer="94"/>
 <attribute name="BOARD_NAME" x="201.93" y="-43.18" size="2.54" layer="94"/>
+</instance>
+<instance part="U$2" gate="G$1" x="111.76" y="119.38" smashed="yes" rot="R180">
+<attribute name="NAME" x="114.049909375" y="117.47173125" size="1.781040625" layer="95" rot="R180"/>
+<attribute name="VALUE" x="114.05023125" y="122.81535" size="1.7813" layer="96" rot="R180"/>
 </instance>
 </instances>
 <busses>
@@ -9685,11 +9770,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <pinref part="C3" gate="G$1" pin="1"/>
 <wire x1="96.52" y1="99.06" x2="96.52" y2="119.38" width="0.1524" layer="91"/>
 <junction x="96.52" y="99.06"/>
-<pinref part="3S_BATTERY" gate="G$1" pin="1"/>
-<wire x1="96.52" y1="119.38" x2="121.92" y2="119.38" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="119.38" x2="96.52" y2="132.08" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="132.08" x2="238.76" y2="132.08" width="0.1524" layer="91"/>
-<junction x="96.52" y="119.38"/>
 <wire x1="215.9" y1="53.34" x2="215.9" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="215.9" y1="43.18" x2="261.62" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="261.62" y1="43.18" x2="261.62" y2="91.44" width="0.1524" layer="91"/>
@@ -9701,6 +9783,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <pinref part="C7" gate="G$1" pin="1"/>
 <pinref part="C8" gate="G$1" pin="1"/>
 <wire x1="238.76" y1="132.08" x2="238.76" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="C"/>
+<wire x1="106.68" y1="119.38" x2="96.52" y2="119.38" width="0.1524" layer="91"/>
+<junction x="96.52" y="119.38"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -9751,10 +9836,15 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="73.66" y1="60.96" x2="73.66" y2="60.706" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="60.706" x2="52.07" y2="60.706" width="0.1524" layer="91"/>
 <wire x1="52.07" y1="60.706" x2="52.07" y2="19.812" width="0.1524" layer="91"/>
-<wire x1="52.07" y1="19.812" x2="9.398" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="52.07" y1="19.812" x2="51.562" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="51.562" y1="19.812" x2="9.398" y2="19.812" width="0.1524" layer="91"/>
 <wire x1="9.398" y1="19.812" x2="9.398" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="ADC13/GPIO15"/>
 <wire x1="9.398" y1="38.1" x2="2.54" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="IC4" gate="G$1" pin="INH"/>
+<wire x1="215.9" y1="63.5" x2="144.78" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="63.5" x2="144.78" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="19.812" x2="52.07" y2="19.812" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$26" class="0">
@@ -9914,19 +10004,6 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="152.4" y1="80.01" x2="162.56" y2="80.01" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$41" class="0">
-<segment>
-<wire x1="215.9" y1="63.5" x2="215.9" y2="63.246" width="0.1524" layer="91"/>
-<pinref part="IC4" gate="G$1" pin="INH"/>
-<pinref part="U$1" gate="G$1" pin="ADC17/GPIO27"/>
-<wire x1="-48.26" y1="50.8" x2="-54.102" y2="50.8" width="0.1524" layer="91"/>
-<wire x1="-54.102" y1="50.8" x2="-54.102" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="-54.102" y1="7.62" x2="154.94" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="154.94" y1="7.62" x2="154.94" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="154.94" y1="63.5" x2="215.9" y2="63.5" width="0.1524" layer="91"/>
-<junction x="215.9" y="63.5"/>
-</segment>
-</net>
 <net name="N$42" class="0">
 <segment>
 <wire x1="248.92" y1="73.66" x2="248.92" y2="72.644" width="0.1524" layer="91"/>
@@ -9957,6 +10034,13 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="-49.784" y1="2.54" x2="-49.784" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="ADC15/GPIO12"/>
 <wire x1="-49.784" y1="45.72" x2="-48.26" y2="45.72" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="3S_BATTERY" gate="G$1" pin="1"/>
+<pinref part="U$2" gate="G$1" pin="A"/>
+<wire x1="121.92" y1="119.38" x2="116.84" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
