@@ -9150,7 +9150,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </library>
 </libraries>
 <attributes>
-<attribute name="AUTHOR" value="Alexander Dunn"/>
+<attribute name="AUTHOR" value="Dunn, Frabosilio, Lee"/>
 <attribute name="BOARD_NAME" value="Satellite Platform Schematic"/>
 <attribute name="PROJECT_NAME" value="ME 507 Project"/>
 </attributes>
@@ -9210,9 +9210,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
 <part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND10" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="FRAME1" library="ME507" deviceset="TITLEBLOCK_TAB_L" device=""/>
-<part name="FRAME2" library="ME507" deviceset="TITLEBLOCK_TAB_L" device=""/>
 <part name="U$2" library="MBRM140T3G" deviceset="MBRM140T3G" device=""/>
+<part name="FRAME1" library="ME507" deviceset="TITLEBLOCK_TAB_L" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -9436,20 +9435,20 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <instance part="GND10" gate="1" x="238.76" y="91.44" smashed="yes">
 <attribute name="VALUE" x="236.22" y="88.9" size="1.778" layer="96"/>
 </instance>
-<instance part="FRAME1" gate="G$1" x="-109.22" y="-66.04" smashed="yes"/>
-<instance part="FRAME2" gate="G$3" x="-105.41" y="-66.04" smashed="yes"/>
-<instance part="FRAME2" gate="G$2" x="189.23" y="-66.04" smashed="yes">
-<attribute name="LAST_DATE_TIME" x="201.93" y="-54.61" size="2.54" layer="94"/>
-<attribute name="SHEET" x="231.14" y="-59.69" size="2.54" layer="94"/>
-<attribute name="DRAWING_NAME" x="282.575" y="-62.23" size="2.54" layer="94" align="bottom-right"/>
-<attribute name="PROJECT_NAME" x="207.01" y="-35.56" size="2.54" layer="94"/>
-<attribute name="AUTHOR" x="212.09" y="-49.53" size="2.54" layer="94"/>
-<attribute name="BOARD_NAME" x="201.93" y="-43.18" size="2.54" layer="94"/>
-</instance>
 <instance part="U$2" gate="G$1" x="111.76" y="119.38" smashed="yes" rot="R180">
 <attribute name="NAME" x="114.049909375" y="117.47173125" size="1.781040625" layer="95" rot="R180"/>
 <attribute name="VALUE" x="114.05023125" y="122.81535" size="1.7813" layer="96" rot="R180"/>
 </instance>
+<instance part="FRAME1" gate="G$3" x="-96.52" y="-60.96" smashed="yes"/>
+<instance part="FRAME1" gate="G$2" x="198.12" y="-60.96" smashed="yes">
+<attribute name="LAST_DATE_TIME" x="210.82" y="-49.53" size="2.54" layer="94"/>
+<attribute name="SHEET" x="240.03" y="-54.61" size="2.54" layer="94"/>
+<attribute name="DRAWING_NAME" x="291.465" y="-57.15" size="2.54" layer="94" align="bottom-right"/>
+<attribute name="PROJECT_NAME" x="215.9" y="-30.48" size="2.54" layer="94"/>
+<attribute name="AUTHOR" x="220.98" y="-44.45" size="2.54" layer="94"/>
+<attribute name="BOARD_NAME" x="210.82" y="-38.1" size="2.54" layer="94"/>
+</instance>
+<instance part="FRAME1" gate="G$1" x="-101.6" y="-63.5" smashed="yes"/>
 </instances>
 <busses>
 </busses>
