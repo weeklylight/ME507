@@ -9751,10 +9751,15 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="73.66" y1="60.96" x2="73.66" y2="60.706" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="60.706" x2="52.07" y2="60.706" width="0.1524" layer="91"/>
 <wire x1="52.07" y1="60.706" x2="52.07" y2="19.812" width="0.1524" layer="91"/>
-<wire x1="52.07" y1="19.812" x2="9.398" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="52.07" y1="19.812" x2="51.562" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="51.562" y1="19.812" x2="9.398" y2="19.812" width="0.1524" layer="91"/>
 <wire x1="9.398" y1="19.812" x2="9.398" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="ADC13/GPIO15"/>
 <wire x1="9.398" y1="38.1" x2="2.54" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="IC4" gate="G$1" pin="INH"/>
+<wire x1="215.9" y1="63.5" x2="144.78" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="63.5" x2="144.78" y2="19.812" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="19.812" x2="52.07" y2="19.812" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$26" class="0">
@@ -9912,19 +9917,6 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="-55.118" y1="8.89" x2="152.4" y2="8.89" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="8.89" x2="152.4" y2="80.01" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="80.01" x2="162.56" y2="80.01" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$41" class="0">
-<segment>
-<wire x1="215.9" y1="63.5" x2="215.9" y2="63.246" width="0.1524" layer="91"/>
-<pinref part="IC4" gate="G$1" pin="INH"/>
-<pinref part="U$1" gate="G$1" pin="ADC17/GPIO27"/>
-<wire x1="-48.26" y1="50.8" x2="-54.102" y2="50.8" width="0.1524" layer="91"/>
-<wire x1="-54.102" y1="50.8" x2="-54.102" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="-54.102" y1="7.62" x2="154.94" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="154.94" y1="7.62" x2="154.94" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="154.94" y1="63.5" x2="215.9" y2="63.5" width="0.1524" layer="91"/>
-<junction x="215.9" y="63.5"/>
 </segment>
 </net>
 <net name="N$42" class="0">
