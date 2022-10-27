@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Stepper.h>
 
+// https://learn.adafruit.com/adafruit-tb6612-h-bridge-dc-stepper-motor-driver-breakout/using-stepper-motors
+
 // change this to the number of steps on your motor
 #define STEPS 200
 
@@ -12,7 +14,6 @@
 // create an instance of the stepper class, specifying
 // the number of steps of the motor and the pins it's
 // attached to
-
 Stepper stepper(STEPS, AIN2, AIN1, BIN1, BIN2);
 
 
@@ -22,13 +23,18 @@ void setup()
   Serial.println("Stepper test!");
 
   // set the speed of the motor to 30 RPMs
-  stepper.setSpeed(60);
+  stepper.setSpeed(30);
 }
 
 void loop()
 {
   Serial.println("Forward");
   stepper.step(STEPS);
+
+  delay(5000);
+
   Serial.println("Backward");
   stepper.step(-STEPS);
+
+  delay(5000);
 }
