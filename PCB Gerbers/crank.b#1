@@ -48,24 +48,24 @@
 </layers>
 <board>
 <plain>
-<wire x1="54.96433125" y1="4.98743125" x2="-8.21676875" y2="9.47611875" width="0.01" layer="20"/>
-<wire x1="-8.21676875" y1="9.47611875" x2="-8.21676875" y2="-9.47611875" width="0.01" layer="20" curve="188.13"/>
-<wire x1="-8.21676875" y1="-9.47611875" x2="54.96433125" y2="-4.98743125" width="0.01" layer="20"/>
-<wire x1="54.96433125" y1="-4.98743125" x2="54.96433125" y2="4.98743125" width="0.01" layer="20" curve="171.87"/>
-<circle x="-8.89" y="0" radius="2.76" width="0.01" layer="20"/>
-<circle x="-4.40191875" y="4.484109375" radius="1.7767" width="0.01" layer="20"/>
-<circle x="-13.38248125" y="4.537090625" radius="1.721940625" width="0.01" layer="20"/>
-<circle x="-13.38248125" y="-4.49645" radius="1.74843125" width="0.01" layer="20"/>
-<circle x="-4.37543125" y="-4.49645" radius="1.74843125" width="0.01" layer="20"/>
-<circle x="3.81" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="10.16" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="16.51" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="22.86" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="29.21" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="35.56" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="41.91" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="48.26" y="0" radius="1.7" width="0.01" layer="20"/>
-<circle x="54.61" y="0" radius="1.7" width="0.01" layer="20"/>
+<wire x1="63.85433125" y1="4.98743125" x2="0.67323125" y2="9.47611875" width="0.01" layer="20"/>
+<wire x1="0.67323125" y1="9.47611875" x2="0.67323125" y2="-9.47611875" width="0.01" layer="20" curve="188.13"/>
+<wire x1="0.67323125" y1="-9.47611875" x2="63.85433125" y2="-4.98743125" width="0.01" layer="20"/>
+<wire x1="63.85433125" y1="-4.98743125" x2="63.85433125" y2="4.98743125" width="0.01" layer="20" curve="171.87"/>
+<circle x="0" y="0" radius="2.76" width="0.01" layer="20"/>
+<circle x="4.48808125" y="4.484109375" radius="1.7767" width="0.01" layer="20"/>
+<circle x="-4.49248125" y="4.537090625" radius="1.721940625" width="0.01" layer="20"/>
+<circle x="-4.49248125" y="-4.49645" radius="1.74843125" width="0.01" layer="20"/>
+<circle x="4.51456875" y="-4.49645" radius="1.74843125" width="0.01" layer="20"/>
+<circle x="12.7" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="19.05" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="25.4" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="31.75" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="38.1" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="44.45" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="50.8" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="57.15" y="0" radius="1.7" width="0.01" layer="20"/>
+<circle x="63.5" y="0" radius="1.7" width="0.01" layer="20"/>
 </plain>
 <libraries>
 </libraries>
