@@ -1,0 +1,4 @@
+all default settings
+
+for trackPlatBottom, define dimensions as 200mm x 200mm
+   for some reason, the dimensions aren't autofilled.
