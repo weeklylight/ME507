@@ -217,7 +217,7 @@ void loop()
   lis3mdl.getEvent(&mag);
 
   // Print Accelerometer info
-  Serial.printf("Acceleratios: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+  Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
   
   // Print Gyroscope info
   Serial.printf("Gyros: (%f, %f, %f) rad/s\n", gyro.gyro.x, gyro.gyro.y, gyro.gyro.z);

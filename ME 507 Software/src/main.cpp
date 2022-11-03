@@ -14,6 +14,46 @@
 #include <Arduino.h>
 #include "taskshare.h"
 #include "taskqueue.h"
+#include "Adafruit_LSM6DSOX.h"
+#include "Adafruit_LIS3MDL.h"
+#include "Adafruit_GPS.h"
+
+//-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+//--------------------Define Pins------------------------
+
+// GPS Pins
+#define RX2 GPIO_NUM_16
+#define TX2 GPIO_NUM_17
+
+//-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+//-----------------Instantiate Objects-------------------
+
+// IMU Objects
+Adafruit_LSM6DSOX lsm6ds;
+Adafruit_LIS3MDL lis3mdl;
+
+// GPS Objects
+Adafruit_GPS GPS(&Serial2);
 
 //-------------------------------------------------------
 
@@ -84,6 +124,12 @@ void task_imu(void* p_params)
   while (true)
   {
     // Get platform positons from IMU, put them in queues
+    sensors_event_t accel, gyro, mag, temp;
+
+   /* Get new normalized sensor events */
+   lsm6ds.getEvent(&accel, &gyro, &temp);
+   lis3mdl.getEvent(&mag);
+
     thetaX.put(NULL);
     thetaY.put(NULL);
     heading.put(NULL);
@@ -111,14 +157,28 @@ void task_gps(void* p_params)
   {
     Serial.println("GPS Task");
 
-    // Get gps data
-    latitude.put(NULL);
-    longitude.put(NULL);
-    altitude.put(NULL);
-    siv.put(NULL);
+    // Check GPS
+    GPS.read();
 
-    // Set new data flag
-    newData.put(true);
+    // Try to parse data
+    if (!GPS.parse(GPS.lastNMEA()))
+    {
+      // If the data can't be parsed, do nothing
+    }
+
+    // If the data was parsed correctly, update shares
+    else
+    {
+      latitude.put(GPS.latitude);
+      longitude.put(GPS.longitude);
+      altitude.put(GPS.altitude);
+      siv.put(GPS.satellites);
+
+      // Get satHeadings ?
+
+      // Set new data flag
+      newData.put(true);
+    }
 
     // Wait
     vTaskDelay(GPS_DELAY);
@@ -135,7 +195,10 @@ void task_send(void* p_params)
       newData.put(false);
       
       // Get data
-      // Get: latitude, longitude, altitude, SIV
+      Serial.printf("Latitude: %f\n", latitude.get());
+      Serial.printf("Longitude: %f\n", longitude.get());
+      Serial.printf("Altitude: %f\n", altitude.get());
+      Serial.printf("Satellites in View: %d\n", siv.get());
 
       // Send data
 
@@ -179,9 +242,13 @@ void task_position(void* p_params)
 
 void setup()
 {
-  // Begin serial channel
+  // Begin serial channels
   Serial.begin(115200);
   if (!Serial) {}
+
+  Serial2.begin(9600, SERIAL_8N1, RX2, TX2); // GPS serial channel
+  if (!Serial2) {}
+
   Serial.println("Starting");
 
   // Setup tasks
@@ -190,8 +257,30 @@ void setup()
   xTaskCreate(task_gps, "GPS Data", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Data", 1024, NULL, 4, NULL);
   xTaskCreate(task_position, "Position Calculation", 1024, NULL, 2, NULL);
+
+  Serial.println("Tasks created");
+
+  // Setup for IMU
+  bool lsm6ds_success = lsm6ds.begin_I2C(0x6A);
+  bool lis3mdl_success = lis3mdl.begin_I2C(0x1E);
+  lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ); // Set data rate
+  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS); // Set range
+  lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE); // Set performance
+  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE); // Set mode
+  lis3mdl.setIntThreshold(500);
+  lis3mdl.configInterrupt(false, false,
+                          true, // Enable z axis
+                          true, // Polarity
+                          false, // Don't latch
+                          true); // Enabled!
+
+  Serial.println("IMU done");
   
-  Serial.println("Tasks Created");
+  // Setup for GPS
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
+
+  Serial.println("GPS done");
 }
 
 void loop()
