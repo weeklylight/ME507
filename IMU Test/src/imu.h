@@ -20,7 +20,8 @@ class Imu
      public :
           Imu(void);
           sensors_vec_t get_angles(sensors_vec_t a);
-          sensors_vec_t get_gains(sensors_vec_t a);
+          sensors_vec_t get_error(sensors_vec_t a, sensors_vec_t a_c);
+          sensors_vec_t get_motor_ctrl(sensors_vec_t a, sensors_vec_t a_c, float dead_band);
 };
  
 #endif
