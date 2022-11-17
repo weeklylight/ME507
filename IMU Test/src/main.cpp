@@ -4,8 +4,11 @@
 #include <Adafruit_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
 
+#include "imu.h"
+
 Adafruit_LSM6DSOX lsm6ds;
 Adafruit_LIS3MDL lis3mdl;
+Imu iamyou;
 
 void setup(void)
 {
@@ -211,23 +214,26 @@ void loop()
 {
 
   sensors_event_t accel, gyro, mag, temp;
+  sensors_vec_t angles;
 
    /* Get new normalized sensor events */
   lsm6ds.getEvent(&accel, &gyro, &temp);
   lis3mdl.getEvent(&mag);
+  angles = iamyou.get_angles(accel.acceleration);
 
   // Print Accelerometer info
   Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+
+  Serial.printf("Angles: (%f, %f, %f) rad\n\n", angles.x, angles.y, angles.z);
+  // // Print Gyroscope info
+  // Serial.printf("Gyros: (%f, %f, %f) rad/s\n", gyro.gyro.x, gyro.gyro.y, gyro.gyro.z);
   
-  // Print Gyroscope info
-  Serial.printf("Gyros: (%f, %f, %f) rad/s\n", gyro.gyro.x, gyro.gyro.y, gyro.gyro.z);
-  
-  // Print Magnetometer info
-  Serial.printf("Mags: (%f, %f, %f) uTeslas\n\n\n", mag.magnetic.x, mag.magnetic.y, mag.magnetic.z);
+  // // Print Magnetometer info
+  // Serial.printf("Mags: (%f, %f, %f) uTeslas\n\n\n", mag.magnetic.x, mag.magnetic.y, mag.magnetic.z);
   
   // Print temp info
   // Serial.printf("Temperature: %f F\n\n\n", (9/5)*(temp.temperature)+32);
   
-  delay(500);
+  delay(2000);
 
 }
