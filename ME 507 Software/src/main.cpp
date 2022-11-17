@@ -17,6 +17,7 @@
 #include "Adafruit_LSM6DSOX.h"
 #include "Adafruit_LIS3MDL.h"
 #include "Adafruit_GPS.h"
+#include "Stepper.h"
 
 //-------------------------------------------------------
 
@@ -34,6 +35,34 @@
 // GPS Pins
 #define RX2 GPIO_NUM_16
 #define TX2 GPIO_NUM_17
+
+// Motor 1 Pins
+#define AIN2 0
+#define AIN1 2
+#define BIN1 33
+#define BIN2 32
+
+//-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+//--------------------Define Constants------------------------
+
+// GPS Pins
+#define RX2 GPIO_NUM_16
+#define TX2 GPIO_NUM_17
+
+// Motor Constants
+#define STEPS 200
+#define MOTOR_SPEED 50
+#define DEG_PER_STEP 1.8
 
 //-------------------------------------------------------
 
@@ -54,6 +83,9 @@ Adafruit_LIS3MDL lis3mdl;
 
 // GPS Objects
 Adafruit_GPS GPS(&Serial2);
+
+// Stepper Motor Objects
+Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
 
 //-------------------------------------------------------
 
@@ -123,16 +155,17 @@ void task_imu(void* p_params)
 {
   while (true)
   {
+    Serial.println("Task IMU");
     // Get platform positons from IMU, put them in queues
     sensors_event_t accel, gyro, mag, temp;
 
    /* Get new normalized sensor events */
-   lsm6ds.getEvent(&accel, &gyro, &temp);
-   lis3mdl.getEvent(&mag);
+  //  lsm6ds.getEvent(&accel, &gyro, &temp);
+  //  lis3mdl.getEvent(&mag);
 
-    thetaX.put(NULL);
-    thetaY.put(NULL);
-    heading.put(NULL);
+    thetaX.put(1);
+    thetaY.put(1);
+    heading.put(1);
 
     // Wait
     vTaskDelay(IMU_DELAY);
@@ -141,10 +174,22 @@ void task_imu(void* p_params)
 
 void task_motor(void* p_params)
 {
+  float stepX;
+  float stepY;
+
   while (true)
   {
+    Serial.println("Task Motor");
     // Run motor controllers
     // Get: thetaX, thetaY, heading, targetX, targetY
+
+    // Serial.println("Running Motor Task");
+    stepX = DEG_PER_STEP*(targetX.get() - thetaX.get());
+    // stepX = 10;
+
+    // Serial.printf("Stepping %0.3f steps\n", stepX);
+    stepperX.step(stepX);
+    
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
@@ -213,6 +258,7 @@ void task_position(void* p_params)
 {
   while (true)
   {
+    Serial.println("Task Position");
     // Get data
     // Get: thetaX, thetaY, heading
 
@@ -254,33 +300,36 @@ void setup()
   // Setup tasks
   xTaskCreate(task_imu, "IMU Position", 1024, NULL, 10, NULL);
   xTaskCreate(task_motor, "Motor Controller", 1024, NULL, 8, NULL);
-  xTaskCreate(task_gps, "GPS Data", 1024, NULL, 6, NULL);
-  xTaskCreate(task_send, "Send Data", 1024, NULL, 4, NULL);
+  // xTaskCreate(task_gps, "GPS Data", 1024, NULL, 6, NULL);
+  // xTaskCreate(task_send, "Send Data", 1024, NULL, 4, NULL);
   xTaskCreate(task_position, "Position Calculation", 1024, NULL, 2, NULL);
 
   Serial.println("Tasks created");
 
   // Setup for IMU
-  bool lsm6ds_success = lsm6ds.begin_I2C(0x6A);
-  bool lis3mdl_success = lis3mdl.begin_I2C(0x1E);
-  lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ); // Set data rate
-  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS); // Set range
-  lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE); // Set performance
-  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE); // Set mode
-  lis3mdl.setIntThreshold(500);
-  lis3mdl.configInterrupt(false, false,
-                          true, // Enable z axis
-                          true, // Polarity
-                          false, // Don't latch
-                          true); // Enabled!
+  // bool lsm6ds_success = lsm6ds.begin_I2C(0x6A);
+  // bool lis3mdl_success = lis3mdl.begin_I2C(0x1E);
+  // lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ); // Set data rate
+  // lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS); // Set range
+  // lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE); // Set performance
+  // lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE); // Set mode
+  // lis3mdl.setIntThreshold(500);
+  // lis3mdl.configInterrupt(false, false,
+  //                         true, // Enable z axis
+  //                         true, // Polarity
+  //                         false, // Don't latch
+  //                         true); // Enabled!
 
   Serial.println("IMU done");
   
   // Setup for GPS
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
+  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
+  // GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
 
   Serial.println("GPS done");
+
+  // Setup for Motors
+  stepperX.setSpeed(MOTOR_SPEED);
 }
 
 void loop()

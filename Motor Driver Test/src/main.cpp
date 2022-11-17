@@ -4,31 +4,29 @@
 // https://learn.adafruit.com/adafruit-tb6612-h-bridge-dc-stepper-motor-driver-breakout/using-stepper-motors
 
 // change this to the number of steps on your motor
-#define STEPS 150
+#define STEPS 200
 
-// #define AIN2 12
-// #define AIN1 14
-// #define BIN1 27
-// #define BIN2 26
+// #define A2 12
+// #define A1 14
+// #define A3 27
+// #define A4 26
 
 // 0 2 33 32
 
-#define AIN2 0
-#define AIN1 2
-#define BIN1 33
-#define BIN2 32
+#define A2 0
+#define A1 2
+#define A3 33
+#define A4 32
 
 // create an instance of the stepper class, specifying
 // the number of steps of the motor and the pins it's
 // attached to
-// Stepper stepper(STEPS, AIN1, AIN2, BIN1, BIN2);
-// Stepper stepper(STEPS, AIN1, AIN2, BIN2, BIN1);
-// Stepper stepper(STEPS, AIN2, AIN1, BIN1, BIN2);
-// Stepper stepper(STEPS, AIN2, AIN1, BIN2, BIN1);
 
-// Stepper stepper(STEPS, AIN1, BIN1, AIN2, BIN2);
-Stepper stepper(STEPS, AIN2, BIN1, AIN1, BIN2);
-// Stepper stepper(STEPS, AIN2, BIN2, AIN1, BIN1);
+// Stepper stepper(STEPS, A4, A3, A2, A1);
+
+
+Stepper stepper(STEPS, A1, A3, A2, A4); // For Breakout board
+
 
 
 
