@@ -214,17 +214,24 @@ void loop()
 {
 
   sensors_event_t accel, gyro, mag, temp;
-  sensors_vec_t angles;
+  sensors_vec_t angles, control_angles, ctrl;
 
    /* Get new normalized sensor events */
   lsm6ds.getEvent(&accel, &gyro, &temp);
   lis3mdl.getEvent(&mag);
   angles = iamyou.get_angles(accel.acceleration);
 
-  // Print Accelerometer info
-  Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+  control_angles.x = 0;
+  control_angles.y = 0;
+  control_angles.z = 0;
 
-  Serial.printf("Angles: (%f, %f, %f) rad\n\n", angles.x, angles.y, angles.z);
+  ctrl = iamyou.get_motor_ctrl(angles, control_angles, 5);
+
+  // Print Accelerometer info
+  //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+  //Serial.printf("Angles: (%f, %f, %f) rad\n\n", angles.x, angles.y, angles.z);
+  Serial.printf("Ctrl: (%f, %f, %f) rad\n\n", ctrl.x, ctrl.y, ctrl.z);
+
   // // Print Gyroscope info
   // Serial.printf("Gyros: (%f, %f, %f) rad/s\n", gyro.gyro.x, gyro.gyro.y, gyro.gyro.z);
   
@@ -234,6 +241,6 @@ void loop()
   // Print temp info
   // Serial.printf("Temperature: %f F\n\n\n", (9/5)*(temp.temperature)+32);
   
-  delay(2000);
+  delay(500);
 
 }
