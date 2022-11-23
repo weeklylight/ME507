@@ -18,14 +18,23 @@
 #define A3 33
 #define A4 32
 
+// Motor one on board
+#define IN1 0
+#define IN2 2
+#define IN3 33
+#define IN4 32
+
+
 // create an instance of the stepper class, specifying
 // the number of steps of the motor and the pins it's
 // attached to
 
-// Stepper stepper(STEPS, A4, A3, A2, A1);
+
+// Stepper stepper(STEPS, A1, A3, A2, A4); // For Breakout board
 
 
-Stepper stepper(STEPS, A1, A3, A2, A4); // For Breakout board
+// Stepper stepper(STEPS, IN1, IN2, IN3, IN4);
+Stepper stepper(STEPS, IN1, IN3, IN2, IN4);
 
 
 
@@ -35,8 +44,13 @@ void setup()
   Serial.begin(115200);
   Serial.println("Stepper test!");
 
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
   // set the speed of the motor to 30 RPMs
-  stepper.setSpeed(50);
+  stepper.setSpeed(10);
 }
 
 void loop()
