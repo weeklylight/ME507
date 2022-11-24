@@ -31,10 +31,11 @@
 
 
 // Stepper stepper(STEPS, A1, A3, A2, A4); // For Breakout board
+Stepper stepper(STEPS, A1, A2, A3, A4); // For Breakout board
 
 
 // Stepper stepper(STEPS, IN1, IN2, IN3, IN4);
-Stepper stepper(STEPS, IN1, IN3, IN2, IN4);
+// Stepper stepper(STEPS, IN1, IN3, IN2, IN4);
 
 
 

@@ -42,6 +42,11 @@
 #define BIN1 33
 #define BIN2 32
 
+#define A2 0
+#define A1 2
+#define A3 33
+#define A4 32
+
 //-------------------------------------------------------
 
 
@@ -85,7 +90,8 @@ Adafruit_LIS3MDL lis3mdl;
 Adafruit_GPS GPS(&Serial2);
 
 // Stepper Motor Objects
-Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
+// Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
+Stepper stepperX(STEPS, A1, A2, A3, A4); // For Breakout board
 
 //-------------------------------------------------------
 
@@ -103,7 +109,7 @@ Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
 #define IMU_DELAY 2
 #define MOTOR_DELAY 5
 #define GPS_DELAY 1000
-#define CALCULATION_DELAY 1000
+#define POSITION_DELAY 1000
 #define SEND_DELAY 2
 
 //-------------------------------------------------------
@@ -134,9 +140,9 @@ Share<float> targetX("Target Theta X");
 Share<float> targetY("Target Theta Y");
 
 // IMU Data
-Queue<float> thetaX(10, "Theta X");
-Queue<float> thetaY(10, "Theta Y");
-Queue<float> heading(10, "Heading");
+Share<float> thetaX("Theta X");
+Share<float> thetaY("Theta Y");
+Share<float> heading("Heading");
 
 //-------------------------------------------------------
 
@@ -155,9 +161,10 @@ void task_imu(void* p_params)
 {
   while (true)
   {
-    Serial.println("Task IMU");
+    // Serial.println("Task IMU");
+
     // Get platform positons from IMU, put them in queues
-    sensors_event_t accel, gyro, mag, temp;
+    // sensors_event_t accel, gyro, mag, temp;
 
    /* Get new normalized sensor events */
   //  lsm6ds.getEvent(&accel, &gyro, &temp);
@@ -180,16 +187,22 @@ void task_motor(void* p_params)
   while (true)
   {
     Serial.println("Task Motor");
+
     // Run motor controllers
     // Get: thetaX, thetaY, heading, targetX, targetY
 
     // Serial.println("Running Motor Task");
-    stepX = DEG_PER_STEP*(targetX.get() - thetaX.get());
+    // // stepX = DEG_PER_STEP*(targetX.get() - thetaX.get());
     // stepX = 10;
 
-    // Serial.printf("Stepping %0.3f steps\n", stepX);
+    // If target is at a higher theta value, step positive
+    int8_t val = targetX.get() - thetaX.get();
+    if (val>0) stepX = 1;
+    else if (val<0) stepX = -1;
+    else stepX = 0;
+
+    // stepX = 1;
     stepperX.step(stepX);
-    
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
@@ -200,10 +213,10 @@ void task_gps(void* p_params)
 {
   while (true)
   {
-    Serial.println("GPS Task");
+    // Serial.println("Task GPS");
 
     // Check GPS
-    GPS.read();
+    // GPS.read();
 
     // Try to parse data
     if (!GPS.parse(GPS.lastNMEA()))
@@ -226,6 +239,7 @@ void task_gps(void* p_params)
     }
 
     // Wait
+    Serial.flush();
     vTaskDelay(GPS_DELAY);
   }
 }
@@ -236,20 +250,26 @@ void task_send(void* p_params)
   {
     if (newData.get())
     {
+      // Serial.println("Task Send");
+
       // Reset flag
       newData.put(false);
       
       // Get data
-      Serial.printf("Latitude: %f\n", latitude.get());
-      Serial.printf("Longitude: %f\n", longitude.get());
-      Serial.printf("Altitude: %f\n", altitude.get());
-      Serial.printf("Satellites in View: %d\n", siv.get());
+      // Serial.printf("Latitude: %f\n", latitude.get());
+      // Serial.printf("Longitude: %f\n", longitude.get());
+      // Serial.printf("Altitude: %f\n", altitude.get());
+      // Serial.printf("Satellites in View: %d\n", siv.get());
+
+      Serial.print("SIV: ");
+      Serial.println(siv.get());
 
       // Send data
 
     }
 
     // Wait
+    Serial.flush();
     vTaskDelay(SEND_DELAY);
   }
 }
@@ -258,7 +278,7 @@ void task_position(void* p_params)
 {
   while (true)
   {
-    Serial.println("Task Position");
+    // Serial.println("Task Position");
     // Get data
     // Get: thetaX, thetaY, heading
 
@@ -269,7 +289,8 @@ void task_position(void* p_params)
     targetY.put(0);
 
     // Wait
-    vTaskDelay(CALCULATION_DELAY);
+    Serial.flush();
+    vTaskDelay(POSITION_DELAY);
   }
 }
 
@@ -298,11 +319,11 @@ void setup()
   Serial.println("Starting");
 
   // Setup tasks
-  xTaskCreate(task_imu, "IMU Position", 1024, NULL, 10, NULL);
-  xTaskCreate(task_motor, "Motor Controller", 1024, NULL, 8, NULL);
-  // xTaskCreate(task_gps, "GPS Data", 1024, NULL, 6, NULL);
-  // xTaskCreate(task_send, "Send Data", 1024, NULL, 4, NULL);
-  xTaskCreate(task_position, "Position Calculation", 1024, NULL, 2, NULL);
+  xTaskCreate(task_imu, "IMU Task", 1024, NULL, 10, NULL);
+  xTaskCreate(task_motor, "Motor Task", 1024, NULL, 8, NULL);
+  xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
+  xTaskCreate(task_send, "Send Task", 1024, NULL, 4, NULL);
+  xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);
 
   Serial.println("Tasks created");
 
@@ -323,8 +344,8 @@ void setup()
   Serial.println("IMU done");
   
   // Setup for GPS
-  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
-  // GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
 
   Serial.println("GPS done");
 
@@ -334,7 +355,9 @@ void setup()
 
 void loop()
 {
-  // Do nothing
+  // Cannot be run inside an interrupt
+  GPS.read();
+  GPS.parse(GPS.lastNMEA());
 }
 
 //-------------------------------------------------------
