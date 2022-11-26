@@ -20,6 +20,7 @@
 #include "Stepper.h"
 #include <WiFi.h>
 #include <WebServer.h>
+#include "imu.h"
 
 //-------------------------------------------------------
 
@@ -117,6 +118,9 @@ WebServer server (80);
 // IMU Objects
 Adafruit_LSM6DSOX lsm6ds;
 Adafruit_LIS3MDL lis3mdl;
+Imu iamyou;
+sensors_event_t accel, gyro, mag, temp;
+sensors_vec_t angles;
 
 // GPS Objects
 Adafruit_GPS GPS(&Serial2);
@@ -139,8 +143,8 @@ Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); // For Breakout board
 
 //------------------Task Periods [ms]---------------------
 
-#define IMU_DELAY 2
-#define MOTOR_DELAY 5
+#define IMU_DELAY 20
+#define MOTOR_DELAY 50
 #define GPS_DELAY 1000
 #define POSITION_DELAY 1000
 #define SEND_DELAY 500
@@ -256,13 +260,19 @@ void task_imu(void* p_params)
     // Get platform positons from IMU, put them in queues
     // sensors_event_t accel, gyro, mag, temp;
 
-   /* Get new normalized sensor events */
-  //  lsm6ds.getEvent(&accel, &gyro, &temp);
-  //  lis3mdl.getEvent(&mag);
+    /* Get new normalized sensor events */
+    
 
-    thetaX.put(1);
-    thetaY.put(1);
-    heading.put(1);
+    /* Get new normalized sensor events */
+    lsm6ds.getEvent(&accel, &gyro, &temp);
+    lis3mdl.getEvent(&mag);
+    angles = iamyou.get_angles(accel.acceleration);
+    //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+    //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+
+    thetaX.put(angles.x);
+    thetaY.put(angles.y);
+    heading.put(1); //add heading from mag
 
     // Wait
     vTaskDelay(IMU_DELAY);
@@ -279,15 +289,31 @@ void task_motor(void* p_params)
     // Serial.println("Task Motor");
 
     // If target is at a higher theta value, step positive
-    int8_t valX = targetX.get() - thetaX.get();
-    if (valX>0) stepX = 1;
-    else if (valX<0) stepX = -1;
-    else stepX = 0;
+    // int8_t valX = targetX.get() - thetaX.get();
+    // if (valX>0) stepX = 1;
+    // else if (valX<0) stepX = -1;
+    // else stepX = 0;
 
-    int8_t valY = targetY.get() - thetaY.get();
-    if (valY>0) stepY = 1;
-    else if (valY<0) stepY = -1;
-    else stepY = 0;
+    // int8_t valY = targetY.get() - thetaY.get();
+    // if (valY>0) stepY = 1;
+    // else if (valY<0) stepY = -1;
+    // else stepY = 0;
+
+    float e_x = thetaX.get()-targetX.get();
+    float e_y = thetaY.get()-targetY.get();
+    float dead_band =5; //deg
+    if (e_x >dead_band)
+    {stepY = -1;}
+    else if (e_x < -dead_band)
+    {stepY = +1;}
+    else
+    {stepY = 0;}
+    if (e_y >dead_band)
+    {stepX = +1;}
+    else if (e_y < -dead_band)
+    {stepX = -1;}
+    else
+    {stepX = 0;}
 
     stepperX.step(stepX);
     stepperY.step(stepY);
@@ -390,7 +416,7 @@ void setup()
   Serial.println("Starting");
 
   // Setup tasks
-  xTaskCreate(task_imu, "IMU Task", 1024, NULL, 10, NULL);
+  xTaskCreate(task_imu, "IMU Task", 4096, NULL, 10, NULL);
   xTaskCreate(task_motor, "Motor Task", 1024, NULL, 8, NULL);
   xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Task", 8192, NULL, 4, NULL);
@@ -399,18 +425,18 @@ void setup()
   Serial.println("Tasks created");
 
   // Setup for IMU
-  // bool lsm6ds_success = lsm6ds.begin_I2C(0x6A);
-  // bool lis3mdl_success = lis3mdl.begin_I2C(0x1E);
-  // lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ); // Set data rate
-  // lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS); // Set range
-  // lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE); // Set performance
-  // lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE); // Set mode
-  // lis3mdl.setIntThreshold(500);
-  // lis3mdl.configInterrupt(false, false,
-  //                         true, // Enable z axis
-  //                         true, // Polarity
-  //                         false, // Don't latch
-  //                         true); // Enabled!
+  bool lsm6ds_success = lsm6ds.begin_I2C(0x6A);
+  bool lis3mdl_success = lis3mdl.begin_I2C(0x1E);
+  lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ); // Set data rate
+  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS); // Set range
+  lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE); // Set performance
+  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE); // Set mode
+  lis3mdl.setIntThreshold(500);
+  lis3mdl.configInterrupt(false, false,
+                          true, // Enable z axis
+                          true, // Polarity
+                          false, // Don't latch
+                          true); // Enabled!
 
   Serial.println("IMU done");
   

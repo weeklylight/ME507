@@ -229,8 +229,8 @@ void loop()
 
   // Print Accelerometer info
   //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-  //Serial.printf("Angles: (%f, %f, %f) rad\n\n", angles.x, angles.y, angles.z);
-  Serial.printf("Ctrl: (%f, %f, %f) rad\n\n", ctrl.x, ctrl.y, ctrl.z);
+  //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+  Serial.printf("Ctrl: (%f, %f, %f) \n\n", ctrl.x, ctrl.y, ctrl.z);
 
   // // Print Gyroscope info
   // Serial.printf("Gyros: (%f, %f, %f) rad/s\n", gyro.gyro.x, gyro.gyro.y, gyro.gyro.z);
