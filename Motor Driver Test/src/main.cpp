@@ -21,13 +21,13 @@
 // create an instance of the stepper class, specifying
 // the number of steps of the motor and the pins it's
 // attached to
-// Stepper stepper(STEPS, AIN1, AIN2, BIN1, BIN2);
+Stepper stepper(STEPS, AIN1, AIN2, BIN1, BIN2);
 // Stepper stepper(STEPS, AIN1, AIN2, BIN2, BIN1);
 // Stepper stepper(STEPS, AIN2, AIN1, BIN1, BIN2);
 // Stepper stepper(STEPS, AIN2, AIN1, BIN2, BIN1);
 
 // Stepper stepper(STEPS, AIN1, BIN1, AIN2, BIN2);
-Stepper stepper(STEPS, AIN2, BIN1, AIN1, BIN2);
+//Stepper stepper(STEPS, AIN2, BIN1, AIN1, BIN2);
 // Stepper stepper(STEPS, AIN2, BIN2, AIN1, BIN1);
 
 
@@ -38,18 +38,18 @@ void setup()
   Serial.println("Stepper test!");
 
   // set the speed of the motor to 30 RPMs
-  stepper.setSpeed(50);
+  stepper.setSpeed(5);
 }
 
 void loop()
 {
   Serial.println("Forward");
-  stepper.step(STEPS);
+  stepper.step(10);
 
   delay(3000);
 
   Serial.println("Backward");
-  stepper.step(-STEPS);
+  stepper.step(-10);
 
   delay(3000);
 }
