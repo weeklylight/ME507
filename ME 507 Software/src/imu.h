@@ -1,7 +1,7 @@
-/** @file print_array.h
- *  This file prints arrays with various arguments
+/** @file imu.h
+ *  header file for Imu Class
  *  @author    Kevin Lee
- *  @date      2022-Oct-25
+ *  @date      2022-Nov-25
  */
 #ifndef IMU_H // include guard
 #define IMU_H
@@ -11,6 +11,9 @@
 #include <Adafruit_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
 
+/** @brief   Imu Class
+ *  @details Contains methods dealing with IMU data parsing
+ */
 class Imu
 {
      private :
