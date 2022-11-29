@@ -65,20 +65,22 @@ WebServer server (80);
 #define TX2 GPIO_NUM_17
 
 // Motor 1 Pins
-#define AIN2 0
-#define AIN1 2
-#define BIN1 33
-#define BIN2 32
+#define motX1 2 // AIN1
+#define motX2 0 // AIN2
+#define motX3 33 // BIN1
+#define motX4 32 // BIN2
 
-#define motX2 0
-#define motX1 2
-#define motX3 33
-#define motX4 32
+// Motor 2 Pins
+#define motY1 26 // BIN1
+#define motY2 25 // BIN2
+#define motY3 12 // AIN1
+#define motY4 14 // AIN2
 
-#define motY2 25
-#define motY1 26
-#define motY3 12
-#define motY4 14
+// Limit Switch Pins
+#define L1 36
+#define L2 39
+#define L3 34
+#define L4 35
 
 //-------------------------------------------------------
 
@@ -93,9 +95,7 @@ WebServer server (80);
 
 //--------------------Define Constants------------------------
 
-// GPS Pins
-#define RX2 GPIO_NUM_16
-#define TX2 GPIO_NUM_17
+
 
 // Motor Constants
 #define STEPS 200
@@ -267,12 +267,15 @@ void task_imu(void* p_params)
     lsm6ds.getEvent(&accel, &gyro, &temp);
     lis3mdl.getEvent(&mag);
     angles = iamyou.get_angles(accel.acceleration);
-    //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-    //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+    Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+    Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
 
     thetaX.put(angles.x);
     thetaY.put(angles.y);
     heading.put(1); //add heading from mag
+
+    // thetaX.put(0);
+    // thetaY.put(0);
 
     // Wait
     vTaskDelay(IMU_DELAY);
@@ -284,8 +287,28 @@ void task_motor(void* p_params)
   float stepX;
   float stepY;
 
+  uint8_t L1read = 0;
+  uint8_t L2read = 0;
+  uint8_t L3read = 0;
+  uint8_t L4read = 0;
+
+
   while (true)
   {
+    // Read from limit switches
+    L1read = digitalRead(L1);
+    L2read = digitalRead(L2);
+    L3read = digitalRead(L3);
+    L4read = digitalRead(L4);
+
+    Serial.print(L1read);
+    Serial.print(" ");
+    Serial.print(L2read);
+    Serial.print(" ");
+    Serial.print(L3read);
+    Serial.print(" ");
+    Serial.println(L4read);
+
     // Serial.println("Task Motor");
 
     // If target is at a higher theta value, step positive
@@ -301,22 +324,22 @@ void task_motor(void* p_params)
 
     float e_x = thetaX.get()-targetX.get();
     float e_y = thetaY.get()-targetY.get();
-    float dead_band =5; //deg
-    if (e_x >dead_band)
+    float dead_band = 5; //deg
+    if (e_x > dead_band)
     {stepY = -1;}
     else if (e_x < -dead_band)
     {stepY = +1;}
     else
     {stepY = 0;}
-    if (e_y >dead_band)
+    if (e_y > dead_band)
     {stepX = +1;}
     else if (e_y < -dead_band)
     {stepX = -1;}
     else
     {stepX = 0;}
 
-    stepperX.step(stepX);
-    stepperY.step(stepY);
+    if (!L1read && !L2read) stepperX.step(stepX);
+    if (!L3read && !L4read) stepperY.step(stepY);
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
@@ -401,6 +424,12 @@ void task_send(void* p_params)
 
 void setup()
 {
+  // Setup limit switch pins
+  pinMode(L1, INPUT_PULLUP);
+  pinMode(L2, INPUT_PULLUP);
+  pinMode(L3, INPUT_PULLUP);
+  pinMode(L4, INPUT_PULLUP);
+
   // Begin serial channels
   Serial.begin(115200);
   if (!Serial) {}
