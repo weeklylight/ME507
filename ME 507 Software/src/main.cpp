@@ -33,19 +33,48 @@
 
 
 
-//-----------------------WiFi----------------------------
+//----------------------Settings-------------------------
 
-// Make esp32 create its own access point
-#undef USE_LAN
+// Uncomment this line to provide print statements
+// #define DEBUG
 
-const char* ssid = "trackPlat";   // SSID, network name seen on LAN lists
-const char* password = "kevin123";   // ESP32 WiFi password (min. 8 characters)
+//-------------------------------------------------------
 
-IPAddress local_ip (192, 168, 5, 1); // Address of ESP32 on its own network
-IPAddress gateway (192, 168, 5, 1);  // The ESP32 acts as its own gateway
-IPAddress subnet (255, 255, 255, 0); // Network mask; just leave this as is
 
-WebServer server (80);
+
+
+
+
+
+
+
+
+//------------------Task Periods [ms]---------------------
+
+#define IMU_DELAY 20
+#define MOTOR_DELAY 50
+#define GPS_DELAY 1000
+#define POSITION_DELAY 1000
+#define SEND_DELAY 500
+
+//-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+//--------------------Define Constants------------------------
+
+// Motor Constants
+#define STEPS 200
+#define MOTOR_SPEED 50
+#define DEG_PER_STEP 1.8
+#define DEAD_BAND 2.5
 
 //-------------------------------------------------------
 
@@ -93,16 +122,23 @@ WebServer server (80);
 
 
 
-//--------------------Define Constants------------------------
+//-----------------------WiFi----------------------------
 
+// Make esp32 create its own access point
+#undef USE_LAN
 
+const char* ssid = "trackPlat";   // SSID, network name seen on LAN lists
+const char* password = "kevin123";   // ESP32 WiFi password (min. 8 characters)
 
-// Motor Constants
-#define STEPS 200
-#define MOTOR_SPEED 50
-#define DEG_PER_STEP 1.8
+IPAddress local_ip (192, 168, 5, 1); // Address of ESP32 on its own network
+IPAddress gateway (192, 168, 5, 1);  // The ESP32 acts as its own gateway
+IPAddress subnet (255, 255, 255, 0); // Network mask; just leave this as is
+
+WebServer server (80);
 
 //-------------------------------------------------------
+
+
 
 
 
@@ -129,25 +165,6 @@ Adafruit_GPS GPS(&Serial2);
 // Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
 Stepper stepperX(STEPS, motX1, motX2, motX3, motX4); // For Breakout board
 Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); // For Breakout board
-
-//-------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-//------------------Task Periods [ms]---------------------
-
-#define IMU_DELAY 20
-#define MOTOR_DELAY 50
-#define GPS_DELAY 1000
-#define POSITION_DELAY 1000
-#define SEND_DELAY 500
 
 //-------------------------------------------------------
 
@@ -265,10 +282,13 @@ void task_imu(void* p_params)
 
     /* Get new normalized sensor events */
     lsm6ds.getEvent(&accel, &gyro, &temp);
-    lis3mdl.getEvent(&mag);
+    // lis3mdl.getEvent(&mag);
     angles = iamyou.get_angles(accel.acceleration);
-    Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-    Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+
+    #ifdef DEBUG
+      Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+      Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+    #endif
 
     thetaX.put(angles.x);
     thetaY.put(angles.y);
@@ -301,13 +321,13 @@ void task_motor(void* p_params)
     L3read = digitalRead(L3);
     L4read = digitalRead(L4);
 
-    Serial.print(L1read);
-    Serial.print(" ");
-    Serial.print(L2read);
-    Serial.print(" ");
-    Serial.print(L3read);
-    Serial.print(" ");
-    Serial.println(L4read);
+    // Serial.print(L1read);
+    // Serial.print(" ");
+    // Serial.print(L2read);
+    // Serial.print(" ");
+    // Serial.print(L3read);
+    // Serial.print(" ");
+    // Serial.println(L4read);
 
     // Serial.println("Task Motor");
 
@@ -324,19 +344,24 @@ void task_motor(void* p_params)
 
     float e_x = thetaX.get()-targetX.get();
     float e_y = thetaY.get()-targetY.get();
-    float dead_band = 5; //deg
-    if (e_x > dead_band)
+    if (e_x > DEAD_BAND)
     {stepY = -1;}
-    else if (e_x < -dead_band)
+    else if (e_x < -DEAD_BAND)
     {stepY = +1;}
     else
     {stepY = 0;}
-    if (e_y > dead_band)
+    if (e_y > DEAD_BAND)
     {stepX = +1;}
-    else if (e_y < -dead_band)
+    else if (e_y < -DEAD_BAND)
     {stepX = -1;}
     else
     {stepX = 0;}
+
+    #ifdef DEBUG
+      Serial.print(stepX);
+      Serial.print(" ");
+      Serial.println(stepY);
+    #endif
 
     if (!L1read && !L2read) stepperX.step(stepX);
     if (!L3read && !L4read) stepperY.step(stepY);
