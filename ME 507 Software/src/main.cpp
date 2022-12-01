@@ -37,7 +37,6 @@
 
 // Uncomment this line to provide print statements
 // #define DEBUG
-#define SIV_TRACKER true
 
 //-------------------------------------------------------
 
@@ -57,7 +56,6 @@
 #define GPS_DELAY 1000
 #define POSITION_DELAY 1000
 #define SEND_DELAY 500
-#define SIV_DELAY 2000
 
 //-------------------------------------------------------
 
@@ -408,21 +406,18 @@ void task_position(void* p_params)
 {
   while (true)
   {
-    if (not SIV_TRACKER)
-      {
-      // Serial.println("Task Position");
-      // Get data
-      // Get: thetaX, thetaY, heading
+    // Serial.println("Task Position");
+    // Get data
+    // Get: thetaX, thetaY, heading
 
-      // Run calculations
+    // Run calculations
 
-      // Update targets
-      targetX.put(0);
-      targetY.put(0);
+    // Update targets
+    targetX.put(0);
+    targetY.put(0);
 
-      // Wait
-      vTaskDelay(POSITION_DELAY);
-    }
+    // Wait
+    vTaskDelay(POSITION_DELAY);
   }
 }
 
@@ -446,71 +441,27 @@ void task_send(void* p_params)
 
 void task_optimize_siv(void* p_params) 
 {
-  const uint8_t angleRes = 10; // resolution of grid in degrees
-  const uint8_t maxAngle = 35; // maximum angle of device
-  const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
-  const uint32_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
-
-  int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
-  int sivArrayY [sivArraySize] = {0};
+  uint8_t angleRes = 10; // resolution of grid in degrees
+  uint8_t maxAngle = 35; // maximum angle of device
+  uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
+  uint8_t sivArraySize = (2*divCount + 1)**2
+  uint8_t sivArrayX [sivArraySize]; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
+  uint8_t sivArrayX [sivArraySize];
   sivArrayX[0] = angleRes * divCount;
   sivArrayY[0] = angleRes * divCount;
-  int8_t dirFlag = -1;
-  bool flipFlag = true;
+  int8_t dirFlag = 1;
+  uint8_t rowCount = 0;
   for (uint8_t i = 1; i < sivArraySize; i++)
   {
-    if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
+    if (sivArrayX[i-1] = abs (angleRes)) 
     {
       dirFlag = -1 * dirFlag;
-      sivArrayY[i] = sivArrayY[i-1] - angleRes;
-      sivArrayX[i] = sivArrayX[i-1];
-      flipFlag = true;
+      rowCount++;
+      sivArrayX[i] = rowCount * angleRes
     }
-    else
-    {
-      sivArrayY[i] = sivArrayY[i-1];
-      sivArrayX[i] = sivArrayX[i-1] + dirFlag * angleRes;
-      flipFlag = false;
-    }
-
+    sivArrayX[i] =
   }
-  uint8_t sivCount = 0;
-  uint8_t sivArrayN [sivArraySize] = {0};
-  uint8_t sivMax = 0;
-  uint8_t sivMaxIndex = 0;
-  Serial.println("Created array positions");
-  while (true)
-  {
-    if (SIV_TRACKER)
-    {
-      while(sivCount < sivArraySize)
-      {
-        targetX.put(sivArrayX[sivCount]);
-        targetY.put(sivArrayY[sivCount]);
-        Serial.print(sivCount);
-        Serial.print(": ");
-        Serial.print(sivArrayX[sivCount]);
-        Serial.print(", ");
-        Serial.println(sivArrayY[sivCount]);
-
-        sivCount++;
-        vTaskDelay(SIV_DELAY);
-        sivArrayN[sivCount] = siv.get();
-      }
-      sivCount = 0;
-      while(sivCount < sivArraySize)
-      {
-        if (sivArrayN[sivCount] > sivMax) 
-        {
-          sivMax = sivArrayN[sivCount];
-          sivMaxIndex = sivCount;
-        }
-      }
-      targetX.put(sivArrayX[sivMaxIndex]);
-      targetY.put(sivArrayY[sivMaxIndex]);
-      vTaskDelay(SIV_DELAY*10);
-    }
-  }
+  
 }
 
 //-------------------------------------------------------
@@ -554,7 +505,6 @@ void setup()
   xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Task", 8192, NULL, 4, NULL);
   xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);
-  xTaskCreate(task_optimize_siv, "Optimize Satellite Pos Task", 1024, NULL, 2, NULL);
 
   Serial.println("Tasks created");
 
@@ -577,14 +527,12 @@ void setup()
   // Setup for GPS
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
-  siv.put(0);
 
   Serial.println("GPS done");
 
   // Setup for Motors
   stepperX.setSpeed(MOTOR_SPEED);
   stepperY.setSpeed(MOTOR_SPEED);
-
 }
 
 void loop()
