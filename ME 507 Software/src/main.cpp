@@ -36,7 +36,8 @@
 //----------------------Settings-------------------------
 
 // Uncomment this line to provide print statements
-#define DEBUG
+//#define DEBUG
+#define SIV_TRACKER true
 
 //-------------------------------------------------------
 
@@ -60,6 +61,7 @@
 #define GPS_DELAY 1000
 #define POSITION_DELAY 1000
 #define SEND_DELAY 500
+#define SIV_DELAY 2500
 
 //-------------------------------------------------------
 
@@ -189,6 +191,7 @@ Share<float> latitude("Latitude");
 Share<float> longitude("Longitude");
 Share<float> altitude("Altitude");
 Share<uint8_t> siv("Satellites in View");
+Share<float> dop("Precision");
 
 // Target Data
 Share<float> targetX("Target Theta X");
@@ -241,12 +244,22 @@ void handle_DocumentRoot()
 
     a_str += "<p>";
     a_str += "Latitude: ";
-    a_str += latitude.get();
+    a_str += latitude.get()/100.0;
     a_str += "\n</p>";
 
     a_str += "<p>";
     a_str += "Longitude: ";
-    a_str += longitude.get();
+    a_str += longitude.get()/(-100.0);
+    a_str += "\n</p>";
+
+    a_str += "<p>";
+    a_str += "Altitude: ";
+    a_str += altitude.get();
+    a_str += "\n</p>";
+
+    a_str += "<p>";
+    a_str += "PDOP: ";
+    a_str += dop.get();
     a_str += "\n</p>";
 
     a_str += "</div>\n</body>\n</html>\n";
@@ -325,14 +338,14 @@ void task_motor(void* p_params)
     L3read = digitalRead(L3);
     L4read = digitalRead(L4);
 
-    Serial.println("Limit Switches: ");
-    Serial.print(L1read);
-    Serial.print(" ");
-    Serial.print(L2read);
-    Serial.print(" ");
-    Serial.print(L3read);
-    Serial.print(" ");
-    Serial.println(L4read);
+    // Serial.println("Limit Switches: ");
+    // Serial.print(L1read);
+    // Serial.print(" ");
+    // Serial.print(L2read);
+    // Serial.print(" ");
+    // Serial.print(L3read);
+    // Serial.print(" ");
+    // Serial.println(L4read);
 
     // Serial.println("Task Motor");
 
@@ -413,6 +426,7 @@ void task_gps(void* p_params)
       longitude.put(GPS.longitude);
       altitude.put(GPS.altitude);
       siv.put(GPS.satellites);
+      dop.put(GPS.PDOP);
     }
 
     // Wait
@@ -424,6 +438,7 @@ void task_position(void* p_params)
 {
   while (true)
   {
+    {
     // Serial.println("Task Position");
     // Get data
     // Get: thetaX, thetaY, heading
@@ -431,11 +446,12 @@ void task_position(void* p_params)
     // Run calculations
 
     // Update targets
-    targetX.put(0);
-    targetY.put(0);
+    //targetX.put(0);
+    //targetY.put(0);
 
     // Wait
     vTaskDelay(POSITION_DELAY);
+    }
   }
 }
 
@@ -459,27 +475,116 @@ void task_send(void* p_params)
 
 void task_optimize_siv(void* p_params) 
 {
-  uint8_t angleRes = 10; // resolution of grid in degrees
-  uint8_t maxAngle = 35; // maximum angle of device
-  uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
-  uint8_t sivArraySize = pow((2*divCount + 1), 2);
-  uint8_t sivArrayX [sivArraySize]; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
-  uint8_t sivArrayY [sivArraySize];
+  const uint8_t angleRes = 8; // resolution of grid in degrees
+  const uint8_t maxAngle = 18; // maximum angle of device
+  const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
+  const uint8_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
+
+  int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
+  int sivArrayY [sivArraySize] = {0};
   sivArrayX[0] = angleRes * divCount;
   sivArrayY[0] = angleRes * divCount;
-  int8_t dirFlag = 1;
-  uint8_t rowCount = 0;
-  // for (uint8_t i = 1; i < sivArraySize; i++)
-  // {
-  //   if (sivArrayX[i-1] = abs (angleRes)) 
-  //   {
-  //     dirFlag = -1 * dirFlag;
-  //     rowCount++;
-  //     sivArrayX[i] = rowCount * angleRes;
-  //   }
-  //   sivArrayX[i] =
-  // }
-  
+  int8_t dirFlag = -1;
+  bool flipFlag = true;
+  for (uint8_t i = 1; i < sivArraySize; i++)
+  {
+    if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
+    {
+      dirFlag = -1 * dirFlag;
+      sivArrayY[i] = sivArrayY[i-1] - angleRes;
+      sivArrayX[i] = sivArrayX[i-1];
+      flipFlag = true;
+    }
+    else
+    {
+      sivArrayY[i] = sivArrayY[i-1];
+      sivArrayX[i] = sivArrayX[i-1] + dirFlag * angleRes;
+      flipFlag = false;
+    }
+
+  }
+  uint8_t sivCount = 0;
+  uint8_t sivArrayN [sivArraySize] = {0};
+  float sivArrayP [sivArraySize] = {0};
+  // uint8_t sivNMax = 0;
+  float sivPMin = 10;
+  uint8_t sivMaxIndex = 0;
+  Serial.println("Created array positions");
+  vTaskDelay(5000);
+  while (true)
+  {
+    if (SIV_TRACKER)
+    {
+      while(true)
+      {
+        targetX.put(sivArrayX[sivCount]);
+        targetY.put(sivArrayY[sivCount]);
+        
+
+        
+        vTaskDelay(SIV_DELAY);
+        sivArrayN[sivCount] = siv.get();
+        sivArrayP[sivCount] = dop.get();
+
+        Serial.print(sivCount);
+        Serial.print(": ");
+        Serial.print(sivArrayX[sivCount]);
+        Serial.print(", ");
+        Serial.print(sivArrayY[sivCount]);
+        Serial.print("; ");
+        Serial.print(sivArrayN[sivCount]);
+        Serial.print(" satellites in view, ");
+        Serial.printf("%0.2fm of precision.\n", sivArrayP[sivCount]);
+        sivCount++; 
+        if (sivCount >= sivArraySize)
+        {
+          break;
+        }
+      }
+      sivCount = 0;
+      // uint8_t sivNMaxInit = sivArrayN[sivCount];
+      float sivPMinInit = sivArrayP[sivCount];
+      while(true)
+      {
+        if (sivArrayP[sivCount] <= sivPMin) 
+        {
+          // sivNMax = sivArrayN[sivCount];
+          sivPMin = sivArrayP[sivCount];
+          sivMaxIndex = sivCount;
+        }
+        sivCount++;
+        if (sivCount >= sivArraySize)
+        {
+          break;
+        }
+      }
+      if ((sivPMinInit == sivPMin) && (sivMaxIndex == sivCount-1))
+      {
+        targetX.put(0);
+        targetY.put(0);
+        Serial.println();
+        Serial.print("All positions similar; set to horiziontal position: (0, 0),");
+      }
+      else
+      {
+        targetX.put(sivArrayX[sivMaxIndex]);
+        targetY.put(sivArrayY[sivMaxIndex]);
+        Serial.println();
+        Serial.print("Optimal position found: (");
+      }
+      Serial.print(sivArrayX[sivMaxIndex]);
+      Serial.print(", ");
+      Serial.print(sivArrayY[sivMaxIndex]);
+      Serial.print("), ");
+      Serial.print(sivArrayN[sivMaxIndex]);
+      Serial.print(" satellites in view, ");
+      Serial.printf("%0.2fm of precision.\n\n", sivArrayP[sivMaxIndex]);
+      sivCount = 0;
+      sivMaxIndex = 0;
+      sivPMin = 10;
+      vTaskDelay(SIV_DELAY*10);
+    }
+  }
 }
 
 //-------------------------------------------------------
@@ -523,6 +628,7 @@ void setup()
   xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Task", 8192, NULL, 4, NULL);
   xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);
+  xTaskCreate(task_optimize_siv, "Optimize Satellite Pos Task", 4096*2, NULL, 2, NULL);
 
   Serial.println("Tasks created");
 
@@ -543,14 +649,17 @@ void setup()
   Serial.println("IMU done");
   
   // Setup for GPS
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Set NMEA sentence type
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGAGSA); // Set NMEA sentence type
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ); // Set output rate
+  siv.put(0);
+  dop.put(0);
 
   Serial.println("GPS done");
 
   // Setup for Motors
   stepperX.setSpeed(MOTOR_SPEED);
   stepperY.setSpeed(MOTOR_SPEED);
+
 }
 
 void loop()
