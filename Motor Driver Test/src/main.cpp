@@ -5,7 +5,7 @@
 
 // change this to the number of steps on your motor
 #define STEPS 200
-#define WAIT 20
+#define WAIT 200
 
 // Motor 1 Pins
 #define motX1 2 // AIN1

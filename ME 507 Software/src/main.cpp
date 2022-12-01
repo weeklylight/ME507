@@ -54,8 +54,8 @@
 // #define IMU_DELAY 20
 // #define MOTOR_DELAY 50
 
-#define IMU_DELAY 500
-#define MOTOR_DELAY 1000
+#define IMU_DELAY 40
+#define MOTOR_DELAY 100
 
 #define GPS_DELAY 1000
 #define POSITION_DELAY 1000
@@ -290,8 +290,8 @@ void task_imu(void* p_params)
     angles = iamyou.get_angles(accel.acceleration);
 
     #ifdef DEBUG
-      Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-      Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+      //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+      //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
     #endif
 
     thetaX.put(angles.x);
@@ -359,16 +359,16 @@ void task_motor(void* p_params)
     #endif
 
     if (e_x > DEAD_BAND)
-    {stepY = -2;}
+    {stepY = -1;}
     else if (e_x < -DEAD_BAND)
-    {stepY = +2;}
+    {stepY = +1;}
     else
     {stepY = 0;}
 
     if (e_y > DEAD_BAND)
-    {stepX = +2;}
+    {stepX = -1;}
     else if (e_y < -DEAD_BAND)
-    {stepX = -2;}
+    {stepX = +1;}
     else
     {stepX = 0;}
 
@@ -385,9 +385,9 @@ void task_motor(void* p_params)
     if ((stepY > 0) && (!L3read)) stepperY.step(stepY); // y+ and not L2
     else if ((stepY < 0) && (!L1read)) stepperY.step(stepY); // y- and not L4
 
-    // if ((stepX > 0) && (!L2read)) stepperX.step(stepX); // x+ and not L3
-    // else if ((stepX < 0) && (!L4read)) stepperX.step(stepX); // x- and not L1
-    stepperX.step(stepX);
+    if ((stepX > 0) && (!L4read)) stepperX.step(stepX); // x+ and not L3
+    else if ((stepX < 0) && (!L2read)) stepperX.step(stepX); // x- and not L1
+    // stepperX.step(-stepX);
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
