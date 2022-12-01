@@ -52,12 +52,8 @@
 
 //------------------Task Periods [ms]---------------------
 
-// #define IMU_DELAY 20
-// #define MOTOR_DELAY 50
-
-#define IMU_DELAY 40
-#define MOTOR_DELAY 100
-
+#define IMU_DELAY 20
+#define MOTOR_DELAY 50
 #define GPS_DELAY 1000
 #define POSITION_DELAY 1000
 #define SEND_DELAY 500
@@ -80,7 +76,7 @@
 #define STEPS 200
 #define MOTOR_SPEED 50
 #define DEG_PER_STEP 1.8
-#define DEAD_BAND 5
+#define DEAD_BAND 2.5
 
 //-------------------------------------------------------
 
@@ -292,8 +288,8 @@ void task_imu(void* p_params)
     angles = iamyou.get_angles(accel.acceleration);
 
     #ifdef DEBUG
-      //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-      //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+      Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+      Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
     #endif
 
     thetaX.put(angles.x);
@@ -310,8 +306,8 @@ void task_imu(void* p_params)
 
 void task_motor(void* p_params)
 {
-  int8_t stepX;
-  int8_t stepY;
+  float stepX;
+  float stepY;
 
   uint8_t L1read = 0;
   uint8_t L2read = 0;
@@ -327,14 +323,13 @@ void task_motor(void* p_params)
     L3read = digitalRead(L3);
     L4read = digitalRead(L4);
 
-    Serial.println("Limit Switches: ");
-    Serial.print(L1read);
-    Serial.print(" ");
-    Serial.print(L2read);
-    Serial.print(" ");
-    Serial.print(L3read);
-    Serial.print(" ");
-    Serial.println(L4read);
+    // Serial.print(L1read);
+    // Serial.print(" ");
+    // Serial.print(L2read);
+    // Serial.print(" ");
+    // Serial.print(L3read);
+    // Serial.print(" ");
+    // Serial.println(L4read);
 
     // Serial.println("Task Motor");
 
@@ -348,48 +343,35 @@ void task_motor(void* p_params)
     // if (valY>0) stepY = 1;
     // else if (valY<0) stepY = -1;
     // else stepY = 0;
-    
 
     float e_x = thetaX.get()-targetX.get();
     float e_y = thetaY.get()-targetY.get();
-
-    #ifdef DEBUG
-      Serial.print("Errors: ");
-      Serial.print(e_x);
-      Serial.print(", ");
-      Serial.println(e_y);
-    #endif
-
     if (e_x > DEAD_BAND)
     {stepY = -1;}
     else if (e_x < -DEAD_BAND)
     {stepY = +1;}
     else
     {stepY = 0;}
-
     if (e_y > DEAD_BAND)
-    {stepX = -1;}
-    else if (e_y < -DEAD_BAND)
     {stepX = +1;}
+    else if (e_y < -DEAD_BAND)
+    {stepX = -1;}
     else
     {stepX = 0;}
 
     #ifdef DEBUG
-      Serial.print("Steps: ");
       Serial.print(stepX);
-      Serial.print(", ");
+      Serial.print(" ");
       Serial.println(stepY);
     #endif
 
     // if (!L1read && !L2read) stepperX.step(stepX);
     // if (!L3read && !L4read) stepperY.step(stepY);
 
-    if ((stepY > 0) && (!L3read)) stepperY.step(stepY); // y+ and not L2
-    else if ((stepY < 0) && (!L1read)) stepperY.step(stepY); // y- and not L4
-
-    if ((stepX > 0) && (!L4read)) stepperX.step(stepX); // x+ and not L3
-    else if ((stepX < 0) && (!L2read)) stepperX.step(stepX); // x- and not L1
-    // stepperX.step(-stepX);
+    if ((stepX > 0) && (!L3read)) stepperX.step(stepX); // x+ and not L3
+    if ((stepX < 0) && (!L1read)) stepperX.step(stepX); // x- and not L1
+    if ((stepY > 0) && (!L2read)) stepperY.step(stepY); // y+ and not L2
+    if ((stepY < 0) && (!L4read)) stepperY.step(stepY); // y- and not L4
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
@@ -464,27 +446,71 @@ void task_send(void* p_params)
 
 void task_optimize_siv(void* p_params) 
 {
-  uint8_t angleRes = 10; // resolution of grid in degrees
-  uint8_t maxAngle = 35; // maximum angle of device
-  uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
-  uint8_t sivArraySize = (2*divCount + 1)**2
-  uint8_t sivArrayX [sivArraySize]; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
-  uint8_t sivArrayX [sivArraySize];
+  const uint8_t angleRes = 10; // resolution of grid in degrees
+  const uint8_t maxAngle = 35; // maximum angle of device
+  const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
+  const uint32_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
+
+  int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
+  int sivArrayY [sivArraySize] = {0};
   sivArrayX[0] = angleRes * divCount;
   sivArrayY[0] = angleRes * divCount;
-  int8_t dirFlag = 1;
-  uint8_t rowCount = 0;
+  int8_t dirFlag = -1;
+  bool flipFlag = true;
   for (uint8_t i = 1; i < sivArraySize; i++)
   {
-    if (sivArrayX[i-1] = abs (angleRes)) 
+    if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
     {
       dirFlag = -1 * dirFlag;
-      rowCount++;
-      sivArrayX[i] = rowCount * angleRes
+      sivArrayY[i] = sivArrayY[i-1] - angleRes;
+      sivArrayX[i] = sivArrayX[i-1];
+      flipFlag = true;
     }
-    sivArrayX[i] =
+    else
+    {
+      sivArrayY[i] = sivArrayY[i-1];
+      sivArrayX[i] = sivArrayX[i-1] + dirFlag * angleRes;
+      flipFlag = false;
+    }
+
   }
-  
+  uint8_t sivCount = 0;
+  uint8_t sivArrayN [sivArraySize] = {0};
+  uint8_t sivMax = 0;
+  uint8_t sivMaxIndex = 0;
+  Serial.println("Created array positions");
+  while (true)
+  {
+    if (SIV_TRACKER)
+    {
+      while(sivCount < sivArraySize)
+      {
+        targetX.put(sivArrayX[sivCount]);
+        targetY.put(sivArrayY[sivCount]);
+        Serial.print(sivCount);
+        Serial.print(": ");
+        Serial.print(sivArrayX[sivCount]);
+        Serial.print(", ");
+        Serial.println(sivArrayY[sivCount]);
+
+        sivCount++;
+        vTaskDelay(SIV_DELAY);
+        sivArrayN[sivCount] = siv.get();
+      }
+      sivCount = 0;
+      while(sivCount < sivArraySize)
+      {
+        if (sivArrayN[sivCount] > sivMax) 
+        {
+          sivMax = sivArrayN[sivCount];
+          sivMaxIndex = sivCount;
+        }
+      }
+      targetX.put(sivArrayX[sivMaxIndex]);
+      targetY.put(sivArrayY[sivMaxIndex]);
+      vTaskDelay(SIV_DELAY*10);
+    }
+  }
 }
 
 //-------------------------------------------------------
@@ -524,7 +550,7 @@ void setup()
 
   // Setup tasks
   xTaskCreate(task_imu, "IMU Task", 4096, NULL, 10, NULL);
-  xTaskCreate(task_motor, "Motor Task", 4096, NULL, 8, NULL);
+  xTaskCreate(task_motor, "Motor Task", 1024, NULL, 8, NULL);
   xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Task", 8192, NULL, 4, NULL);
   xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);

@@ -5,23 +5,37 @@
 
 // change this to the number of steps on your motor
 #define STEPS 200
-#define WAIT 200
 
-// Motor 1 Pins
-#define motX1 2 // AIN1
-#define motX2 0 // AIN2
-#define motX3 33 // BIN1
-#define motX4 32 // BIN2
+// #define A2 12
+// #define A1 14
+// #define A3 27
+// #define A4 26
 
-// Motor 2 Pins
-#define motY1 26 // BIN1
-#define motY2 25 // BIN2
-#define motY3 12 // AIN1
-#define motY4 14 // AIN2
+// 0 2 33 32
+
+#define A2 0
+#define A1 2
+#define A3 33
+#define A4 32
+
+// Motor one on board
+#define IN1 0
+#define IN2 2
+#define IN3 33
+#define IN4 32
 
 
-Stepper stepperX(STEPS, motX1, motX2, motX3, motX4); // For Breakout board
-Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); // For Breakout board
+// create an instance of the stepper class, specifying
+// the number of steps of the motor and the pins it's
+// attached to
+
+
+// Stepper stepper(STEPS, A1, A3, A2, A4); // For Breakout board
+Stepper stepper(STEPS, A1, A2, A3, A4); // For Breakout board
+
+
+// Stepper stepper(STEPS, IN1, IN2, IN3, IN4);
+// Stepper stepper(STEPS, IN1, IN3, IN2, IN4);
 
 
 
@@ -31,29 +45,24 @@ void setup()
   Serial.begin(115200);
   Serial.println("Stepper test!");
 
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
   // set the speed of the motor to 30 RPMs
-  stepperX.setSpeed(50);
+  stepper.setSpeed(10);
 }
 
 void loop()
 {
   Serial.println("Forward");
-  for (int i = 0; i < 20; i++)
-  {
-    stepperX.step(1);
-    delay(WAIT);
-  }
+  stepper.step(STEPS);
 
-  delay(1000);
+  delay(3000);
 
   Serial.println("Backward");
-  // for (int i = 0; i < 20; i++)
-  // {
-  //   stepperX.step(-1);
-  //   delay(WAIT);
-  // }
-  stepperX.step(-20);
+  stepper.step(-STEPS);
 
-  delay(1000);
-
+  delay(3000);
 }
