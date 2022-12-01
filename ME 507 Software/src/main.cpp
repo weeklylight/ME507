@@ -363,8 +363,13 @@ void task_motor(void* p_params)
       Serial.println(stepY);
     #endif
 
-    if (!L1read && !L2read) stepperX.step(stepX);
-    if (!L3read && !L4read) stepperY.step(stepY);
+    // if (!L1read && !L2read) stepperX.step(stepX);
+    // if (!L3read && !L4read) stepperY.step(stepY);
+
+    if ((stepX > 0) && (!L3read)) stepperX.step(stepX); // x+ and not L3
+    if ((stepX < 0) && (!L1read)) stepperX.step(stepX); // x- and not L1
+    if ((stepY > 0) && (!L2read)) stepperY.step(stepY); // y+ and not L2
+    if ((stepY < 0) && (!L4read)) stepperY.step(stepY); // y- and not L4
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
@@ -432,6 +437,31 @@ void task_send(void* p_params)
     // Wait
     vTaskDelay(SEND_DELAY);
   }
+}
+
+void task_optimize_siv(void* p_params) 
+{
+  uint8_t angleRes = 10; // resolution of grid in degrees
+  uint8_t maxAngle = 35; // maximum angle of device
+  uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
+  uint8_t sivArraySize = (2*divCount + 1)**2
+  uint8_t sivArrayX [sivArraySize]; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
+  uint8_t sivArrayX [sivArraySize];
+  sivArrayX[0] = angleRes * divCount;
+  sivArrayY[0] = angleRes * divCount;
+  int8_t dirFlag = 1;
+  uint8_t rowCount = 0;
+  for (uint8_t i = 1; i < sivArraySize; i++)
+  {
+    if (sivArrayX[i-1] = abs (angleRes)) 
+    {
+      dirFlag = -1 * dirFlag;
+      rowCount++;
+      sivArrayX[i] = rowCount * angleRes
+    }
+    sivArrayX[i] =
+  }
+  
 }
 
 //-------------------------------------------------------
