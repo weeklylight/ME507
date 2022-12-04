@@ -1,7 +1,8 @@
 /**
  * @file main.cpp
- * @author Kevin and the Gang
- * @brief 
+ * @author Kevin Lee
+ * @author Jakob Frabosilio
+ * @author Alexander Dunn
  * @version 0.1
  * @date 2022-11-03
  * 
@@ -35,8 +36,8 @@
 
 //----------------------Settings-------------------------
 
-// Uncomment this line to provide print statements
-//#define DEBUG
+// Uncomment this line to provide print statements.
+#define DEBUG ///< A line to allow for debugging print statements during operation.
 #define SIV_TRACKER true
 
 //-------------------------------------------------------
@@ -52,16 +53,13 @@
 
 //------------------Task Periods [ms]---------------------
 
-// #define IMU_DELAY 20
-// #define MOTOR_DELAY 50
+#define IMU_DELAY 40 ///< The task delay in milliseconds for the IMU task.
+#define MOTOR_DELAY 100 ///< The task delay in milliseconds for the motor task.
 
-#define IMU_DELAY 40
-#define MOTOR_DELAY 100
-
-#define GPS_DELAY 1000
-#define POSITION_DELAY 1000
-#define SEND_DELAY 500
-#define SIV_DELAY 2500
+#define GPS_DELAY 1000 ///< The task delay in milliseconds for the GPS task.
+#define POSITION_DELAY 1000 ///< The task delay in milliseconds for the position calculation task.
+#define SEND_DELAY 500 ///< The task delay in milliseconds for the IoT task.
+#define SIV_DELAY 2500 ///< The task delay in milliseconds for the satellite tracker task.
 
 //-------------------------------------------------------
 
@@ -77,10 +75,9 @@
 //--------------------Define Constants------------------------
 
 // Motor Constants
-#define STEPS 200
-#define MOTOR_SPEED 50
-#define DEG_PER_STEP 1.8
-#define DEAD_BAND 5
+#define STEPS 200 ///< The number of discrete steps for the stpper motors used.
+#define MOTOR_SPEED 50 ///< The motor speed in rpm.
+#define DEAD_BAND 5 ///< An acceptable plate angle error in degrees.
 
 //-------------------------------------------------------
 
@@ -96,26 +93,26 @@
 //--------------------Define Pins------------------------
 
 // GPS Pins
-#define RX2 GPIO_NUM_16
-#define TX2 GPIO_NUM_17
+#define RX2 GPIO_NUM_16 ///< The RX2 pin number used for the GPS.
+#define TX2 GPIO_NUM_17 ///< The TX2 pin number used for the GPS.
 
 // Motor 1 Pins
-#define motX1 2 // AIN1
-#define motX2 0 // AIN2
-#define motX3 33 // BIN1
-#define motX4 32 // BIN2
+#define motX1 2 ///< The AIN1 pin for the X motor.
+#define motX2 0 ///< The AIN2 pin for the X motor.
+#define motX3 33 ///< The BIN1 pin for the X motor.
+#define motX4 32 ///< The BIN2 pin for the X motor.
 
 // Motor 2 Pins
-#define motY1 26 // BIN1
-#define motY2 25 // BIN2
-#define motY3 12 // AIN1
-#define motY4 14 // AIN2
+#define motY1 26 ///< The BIN1 pin for the Y motor.
+#define motY2 25 ///< The BIN2 pin for the Y motor.
+#define motY3 12 ///< The AIN1 pin for the Y motor.
+#define motY4 14 ///< The AIN2 pin for the Y motor.
 
 // Limit Switch Pins
-#define L1 36
-#define L2 39
-#define L3 34
-#define L4 35
+#define L1 36 ///< A pin to read the state of the first limit switch.
+#define L2 39 ///< A pin to read the state of the second limit switch.
+#define L3 34 ///< A pin to read the state of the third limit switch.
+#define L4 35 ///< A pin to read the state of the forth limit switch.
 
 //-------------------------------------------------------
 
