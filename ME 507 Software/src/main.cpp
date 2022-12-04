@@ -130,14 +130,14 @@
 // Make esp32 create its own access point
 #undef USE_LAN
 
-const char* ssid = "trackPlat";   // SSID, network name seen on LAN lists
-const char* password = "kevin123";   // ESP32 WiFi password (min. 8 characters)
+const char* ssid = "trackPlat"; ///< SSID, network name seen on LAN lists.
+const char* password = "kevin123"; ///< ESP32 WiFi password (min. 8 characters).
 
-IPAddress local_ip (192, 168, 5, 1); // Address of ESP32 on its own network
-IPAddress gateway (192, 168, 5, 1);  // The ESP32 acts as its own gateway
-IPAddress subnet (255, 255, 255, 0); // Network mask; just leave this as is
+IPAddress local_ip(192, 168, 5, 1); ///< Address of ESP32 on its own network.
+IPAddress gateway(192, 168, 5, 1);  ///< The ESP32 acts as its own gateway.
+IPAddress subnet(255, 255, 255, 0); ///< Network mask.
 
-WebServer server (80);
+WebServer server(80); ///< The web server object used for IoT functionality.
 
 //-------------------------------------------------------
 
@@ -162,12 +162,11 @@ sensors_event_t accel, gyro, mag, temp;
 sensors_vec_t angles;
 
 // GPS Objects
-Adafruit_GPS GPS(&Serial2);
+Adafruit_GPS GPS(&Serial2); ///< A GPS object.
 
 // Stepper Motor Objects
-// Stepper stepperX(STEPS, AIN1, BIN1, AIN2, BIN2);
-Stepper stepperX(STEPS, motX1, motX2, motX3, motX4); // For Breakout board
-Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); // For Breakout board
+Stepper stepperX(STEPS, motX1, motX2, motX3, motX4); ///< The X motor object.
+Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); ///< The Y motor object.
 
 //-------------------------------------------------------
 
@@ -183,21 +182,19 @@ Stepper stepperY(STEPS, motY1, motY2, motY3, motY4); // For Breakout board
 //-------------------Shares & Queues----------------------
 
 // GPS Data
-Queue<int16_t> satHeadings(100, "Satellite Headings");
-Share<float> latitude("Latitude");
-Share<float> longitude("Longitude");
-Share<float> altitude("Altitude");
-Share<uint8_t> siv("Satellites in View");
-Share<float> dop("Precision");
+Share<float> latitude("Latitude"); ///< A shared variable to store the current latitude.
+Share<float> longitude("Longitude"); ///< A shared variable to store the current longitude.
+Share<float> altitude("Altitude"); ///< A shared variable to store the current altitude.
+Share<uint8_t> siv("Satellites in View"); ///< A shared variable to store the current number of satellites in view.
+Share<float> dop("Precision"); ///< A shared variable to store the current GPS precision.
 
 // Target Data
-Share<float> targetX("Target Theta X");
-Share<float> targetY("Target Theta Y");
+Share<float> targetX("Target Theta X"); ///< A shared variable to store the current X angle target.
+Share<float> targetY("Target Theta Y"); ///< A shared variable to store the current Y angle target.
 
 // IMU Data
-Share<float> thetaX("Theta X");
-Share<float> thetaY("Theta Y");
-Share<float> heading("Heading");
+Share<float> thetaX("Theta X"); ///< A shared variable to store the current X angle.
+Share<float> thetaY("Theta Y"); ///< A shared variable to store the current Y angle.
 
 //-------------------------------------------------------
 
@@ -212,6 +209,12 @@ Share<float> heading("Heading");
 
 //----------------------Functions-------------------------
 
+/**
+ * @brief A function used to setup a webpage hosted by the ESP32.
+ * 
+ * @param a_string A reference to a string which will contain HTML information/
+ * @param page_title A pointer to the location in memory storing the webpage title.
+ */
 void HTML_header(String& a_string, const char* page_title)
 {
     a_string += "<!DOCTYPE html> <html>\n";
@@ -226,6 +229,11 @@ void HTML_header(String& a_string, const char* page_title)
     a_string += "</style>\n</head>\n";
 }
 
+/**
+ * @brief A function to handle requests from the client.
+ * @details This function runs anytime someone refreshes the page and updates the webpage with current data.
+ * 
+ */
 void handle_DocumentRoot()
 {
     // Serial.println("Request from client");
@@ -264,6 +272,10 @@ void handle_DocumentRoot()
     server.send (200, "text/html", a_str); 
 }
 
+/**
+ * @brief A function to handle 404 errors.
+ * 
+ */
 void handle_NotFound(void)
 {
     server.send (404, "text/plain", "Not found");
@@ -282,49 +294,48 @@ void handle_NotFound(void)
 
 //----------------------Tasks----------------------------
 
+/**
+ * @brief The task used to control the IMU.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_imu(void* p_params)
 {
   while (true)
   {
     // Serial.println("Task IMU");
 
-    // Get platform positons from IMU, put them in queues
-    // sensors_event_t accel, gyro, mag, temp;
-
-    /* Get new normalized sensor events */
-    
-
     /* Get new normalized sensor events */
     lsm6ds.getEvent(&accel, &gyro, &temp);
-    // lis3mdl.getEvent(&mag);
     angles = iamyou.get_angles(accel.acceleration);
 
     #ifdef DEBUG
-      //Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
-      //Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
+      Serial.printf("Accelerations: (%f, %f, %f) m/s^2\n", accel.acceleration.x, accel.acceleration.y, accel.acceleration.z);
+      Serial.printf("Angles: (%f, %f, %f) deg\n\n", angles.x, angles.y, angles.z);
     #endif
 
     thetaX.put(angles.x);
     thetaY.put(angles.y);
-    heading.put(1); //add heading from mag
-
-    // thetaX.put(0);
-    // thetaY.put(0);
 
     // Wait
     vTaskDelay(IMU_DELAY);
   }
 }
 
+/**
+ * @brief The task used to control both stepper motors.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_motor(void* p_params)
 {
-  int8_t stepX;
-  int8_t stepY;
+  int8_t stepX; ///< The number of steps to move the X motor.
+  int8_t stepY; ///< The number of steps to move the Y motor.
 
-  uint8_t L1read = 0;
-  uint8_t L2read = 0;
-  uint8_t L3read = 0;
-  uint8_t L4read = 0;
+  uint8_t L1read = 0; ///< A variable to store the state of the first limit switch.
+  uint8_t L2read = 0; ///< A variable to store the state of the second limit switch.
+  uint8_t L3read = 0; ///< A variable to store the state of the third limit switch.
+  uint8_t L4read = 0; ///< A variable to store the state of the fourth limit switch.
 
 
   while (true)
@@ -335,31 +346,19 @@ void task_motor(void* p_params)
     L3read = digitalRead(L3);
     L4read = digitalRead(L4);
 
-    // Serial.println("Limit Switches: ");
-    // Serial.print(L1read);
-    // Serial.print(" ");
-    // Serial.print(L2read);
-    // Serial.print(" ");
-    // Serial.print(L3read);
-    // Serial.print(" ");
-    // Serial.println(L4read);
+    #ifdef DEBUG
+      Serial.println("Limit Switches: ");
+      Serial.print(L1read);
+      Serial.print(" ");
+      Serial.print(L2read);
+      Serial.print(" ");
+      Serial.print(L3read);
+      Serial.print(" ");
+      Serial.println(L4read);
+    #endif
 
-    // Serial.println("Task Motor");
-
-    // If target is at a higher theta value, step positive
-    // int8_t valX = targetX.get() - thetaX.get();
-    // if (valX>0) stepX = 1;
-    // else if (valX<0) stepX = -1;
-    // else stepX = 0;
-
-    // int8_t valY = targetY.get() - thetaY.get();
-    // if (valY>0) stepY = 1;
-    // else if (valY<0) stepY = -1;
-    // else stepY = 0;
-    
-
-    float e_x = thetaX.get()-targetX.get();
-    float e_y = thetaY.get()-targetY.get();
+    float e_x = thetaX.get()-targetX.get(); ///< The proportional error for the X angle.
+    float e_y = thetaY.get()-targetY.get(); ///< The proportional error for the Y angle.
 
     #ifdef DEBUG
       Serial.print("Errors: ");
@@ -389,31 +388,28 @@ void task_motor(void* p_params)
       Serial.println(stepY);
     #endif
 
-    // if (!L1read && !L2read) stepperX.step(stepX);
-    // if (!L3read && !L4read) stepperY.step(stepY);
 
     if ((stepY > 0) && (!L3read)) stepperY.step(stepY); // y+ and not L2
     else if ((stepY < 0) && (!L1read)) stepperY.step(stepY); // y- and not L4
 
     if ((stepX > 0) && (!L4read)) stepperX.step(stepX); // x+ and not L3
     else if ((stepX < 0) && (!L2read)) stepperX.step(stepX); // x- and not L1
-    // stepperX.step(-stepX);
 
     // Wait
     vTaskDelay(MOTOR_DELAY);
   }
 }
 
+/**
+ * @brief The task used to control the GPS readings.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_gps(void* p_params)
 {
   while (true)
   {
-    // Serial.println("Task GPS");
-
-    // Check GPS
-    // GPS.read();
-
-    // Try to parse data
+    // Try to parse the data and do nothing if you can't
     if (!GPS.parse(GPS.lastNMEA())) {}
 
     // If the data was parsed correctly, update shares
@@ -431,17 +427,16 @@ void task_gps(void* p_params)
   }
 }
 
+/**
+ * @brief The task used to update the target platform position.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_position(void* p_params)
 {
   while (true)
   {
     {
-    // Serial.println("Task Position");
-    // Get data
-    // Get: thetaX, thetaY, heading
-
-    // Run calculations
-
     // Update targets
     //targetX.put(0);
     //targetY.put(0);
@@ -452,13 +447,18 @@ void task_position(void* p_params)
   }
 }
 
+/**
+ * @brief The task used to update the webpage.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_send(void* p_params)
 {
   server.on("/", handle_DocumentRoot);
   server.onNotFound(handle_NotFound);
 
-  server.begin ();
-  Serial.println ("HTTP server started");
+  server.begin();
+  Serial.println("HTTP server started");
 
   while (true)
   {
@@ -470,6 +470,11 @@ void task_send(void* p_params)
   }
 }
 
+/**
+ * @brief The task used to control the platform's target position over time.
+ * 
+ * @param p_params A pointer to optional and unused parameters.
+ */
 void task_optimize_siv(void* p_params) 
 {
   const uint8_t angleRes = 8; // resolution of grid in degrees
@@ -597,6 +602,10 @@ void task_optimize_siv(void* p_params)
 
 //---------------------Program---------------------------
 
+/**
+ * @brief The initial setup runs once to define pin modes, create tasks, and setup the peripherals.
+ * 
+ */
 void setup()
 {
   // Setup limit switch pins
@@ -613,9 +622,9 @@ void setup()
   if (!Serial2) {}
 
   // Begin wifi
-  WiFi.mode (WIFI_AP);
-  WiFi.softAPConfig (local_ip, gateway, subnet);
-  WiFi.softAP (ssid, password);
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  WiFi.softAP(ssid, password);
 
   Serial.println("Starting");
 
@@ -659,6 +668,10 @@ void setup()
 
 }
 
+/**
+ * @brief The loop runs continuously to handle interrupt based libraries such as the GPS.
+ * 
+ */
 void loop()
 {
   // Cannot be run inside an interrupt
