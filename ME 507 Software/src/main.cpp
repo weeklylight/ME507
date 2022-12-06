@@ -38,7 +38,11 @@
 
 // Uncomment this line to provide print statements.
 #define DEBUG ///< A line to allow for debugging print statements during operation.
+
 #define SIV_TRACKER true
+
+// Uncomment this line to simply level the platform
+// #define LEVEL ///< A line to enable or disable simple leveling
 
 //-------------------------------------------------------
 
@@ -428,26 +432,6 @@ void task_gps(void* p_params)
 }
 
 /**
- * @brief The task used to update the target platform position.
- * 
- * @param p_params A pointer to optional and unused parameters.
- */
-void task_position(void* p_params)
-{
-  while (true)
-  {
-    {
-    // Update targets
-    //targetX.put(0);
-    //targetY.put(0);
-
-    // Wait
-    vTaskDelay(POSITION_DELAY);
-    }
-  }
-}
-
-/**
  * @brief The task used to update the webpage.
  * 
  * @param p_params A pointer to optional and unused parameters.
@@ -470,124 +454,147 @@ void task_send(void* p_params)
   }
 }
 
-/**
- * @brief The task used to control the platform's target position over time.
- * 
- * @param p_params A pointer to optional and unused parameters.
- */
-void task_optimize_siv(void* p_params) 
-{
-  const uint8_t angleRes = 8; // resolution of grid in degrees
-  const uint8_t maxAngle = 18; // maximum angle of device
-  const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
-  const uint8_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
-
-  int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
-  int sivArrayY [sivArraySize] = {0};
-  sivArrayX[0] = angleRes * divCount;
-  sivArrayY[0] = angleRes * divCount;
-  int8_t dirFlag = -1;
-  bool flipFlag = true;
-  for (uint8_t i = 1; i < sivArraySize; i++)
+#ifdef LEVEL
+  /**
+   * @brief The task used to update the target platform position.
+   * 
+   * @param p_params A pointer to optional and unused parameters.
+   */
+  void task_position(void* p_params)
   {
-    if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
+    while (true)
     {
-      dirFlag = -1 * dirFlag;
-      sivArrayY[i] = sivArrayY[i-1] - angleRes;
-      sivArrayX[i] = sivArrayX[i-1];
-      flipFlag = true;
-    }
-    else
-    {
-      sivArrayY[i] = sivArrayY[i-1];
-      sivArrayX[i] = sivArrayX[i-1] + dirFlag * angleRes;
-      flipFlag = false;
-    }
+      {
+      // Update targets
+      targetX.put(0);
+      targetY.put(0);
 
+      // Wait
+      vTaskDelay(POSITION_DELAY);
+      }
+    }
   }
-  uint8_t sivCount = 0;
-  uint8_t sivArrayN [sivArraySize] = {0};
-  float sivArrayP [sivArraySize] = {0};
-  // uint8_t sivNMax = 0;
-  float sivPMin = 10;
-  uint8_t sivMaxIndex = 0;
-  Serial.println("Created array positions");
-  vTaskDelay(5000);
-  while (true)
+
+#else
+  /**
+   * @brief The task used to control the platform's target position over time.
+   * 
+   * @param p_params A pointer to optional and unused parameters.
+   */
+  void task_optimize_siv(void* p_params) 
   {
-    if (SIV_TRACKER)
+    const uint8_t angleRes = 8; // resolution of grid in degrees
+    const uint8_t maxAngle = 18; // maximum angle of device
+    const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
+    const uint8_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
+
+    int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
+    int sivArrayY [sivArraySize] = {0};
+    sivArrayX[0] = angleRes * divCount;
+    sivArrayY[0] = angleRes * divCount;
+    int8_t dirFlag = -1;
+    bool flipFlag = true;
+    for (uint8_t i = 1; i < sivArraySize; i++)
     {
-      while(true)
+      if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
       {
-        targetX.put(sivArrayX[sivCount]);
-        targetY.put(sivArrayY[sivCount]);
-        
-
-        
-        vTaskDelay(SIV_DELAY);
-        sivArrayN[sivCount] = siv.get();
-        sivArrayP[sivCount] = dop.get();
-
-        Serial.print(sivCount);
-        Serial.print(": ");
-        Serial.print(sivArrayX[sivCount]);
-        Serial.print(", ");
-        Serial.print(sivArrayY[sivCount]);
-        Serial.print("; ");
-        Serial.print(sivArrayN[sivCount]);
-        Serial.print(" satellites in view, ");
-        Serial.printf("%0.2fm of precision.\n", sivArrayP[sivCount]);
-        sivCount++; 
-        if (sivCount >= sivArraySize)
-        {
-          break;
-        }
-      }
-      sivCount = 0;
-      // uint8_t sivNMaxInit = sivArrayN[sivCount];
-      float sivPMinInit = sivArrayP[sivCount];
-      while(true)
-      {
-        if (sivArrayP[sivCount] <= sivPMin) 
-        {
-          // sivNMax = sivArrayN[sivCount];
-          sivPMin = sivArrayP[sivCount];
-          sivMaxIndex = sivCount;
-        }
-        sivCount++;
-        if (sivCount >= sivArraySize)
-        {
-          break;
-        }
-      }
-      if ((sivPMinInit == sivPMin) && (sivMaxIndex == sivCount-1))
-      {
-        targetX.put(0);
-        targetY.put(0);
-        Serial.println();
-        Serial.print("All positions similar; set to horiziontal position: (0, 0),");
+        dirFlag = -1 * dirFlag;
+        sivArrayY[i] = sivArrayY[i-1] - angleRes;
+        sivArrayX[i] = sivArrayX[i-1];
+        flipFlag = true;
       }
       else
       {
-        targetX.put(sivArrayX[sivMaxIndex]);
-        targetY.put(sivArrayY[sivMaxIndex]);
-        Serial.println();
-        Serial.print("Optimal position found: (");
+        sivArrayY[i] = sivArrayY[i-1];
+        sivArrayX[i] = sivArrayX[i-1] + dirFlag * angleRes;
+        flipFlag = false;
       }
-      Serial.print(sivArrayX[sivMaxIndex]);
-      Serial.print(", ");
-      Serial.print(sivArrayY[sivMaxIndex]);
-      Serial.print("), ");
-      Serial.print(sivArrayN[sivMaxIndex]);
-      Serial.print(" satellites in view, ");
-      Serial.printf("%0.2fm of precision.\n\n", sivArrayP[sivMaxIndex]);
-      sivCount = 0;
-      sivMaxIndex = 0;
-      sivPMin = 10;
-      vTaskDelay(SIV_DELAY*10);
+
+    }
+    uint8_t sivCount = 0;
+    uint8_t sivArrayN [sivArraySize] = {0};
+    float sivArrayP [sivArraySize] = {0};
+    // uint8_t sivNMax = 0;
+    float sivPMin = 10;
+    uint8_t sivMaxIndex = 0;
+    Serial.println("Created array positions");
+    vTaskDelay(5000);
+    while (true)
+    {
+      if (SIV_TRACKER)
+      {
+        while(true)
+        {
+          targetX.put(sivArrayX[sivCount]);
+          targetY.put(sivArrayY[sivCount]);
+          
+
+          
+          vTaskDelay(SIV_DELAY);
+          sivArrayN[sivCount] = siv.get();
+          sivArrayP[sivCount] = dop.get();
+
+          Serial.print(sivCount);
+          Serial.print(": ");
+          Serial.print(sivArrayX[sivCount]);
+          Serial.print(", ");
+          Serial.print(sivArrayY[sivCount]);
+          Serial.print("; ");
+          Serial.print(sivArrayN[sivCount]);
+          Serial.print(" satellites in view, ");
+          Serial.printf("%0.2fm of precision.\n", sivArrayP[sivCount]);
+          sivCount++; 
+          if (sivCount >= sivArraySize)
+          {
+            break;
+          }
+        }
+        sivCount = 0;
+        // uint8_t sivNMaxInit = sivArrayN[sivCount];
+        float sivPMinInit = sivArrayP[sivCount];
+        while(true)
+        {
+          if (sivArrayP[sivCount] <= sivPMin) 
+          {
+            // sivNMax = sivArrayN[sivCount];
+            sivPMin = sivArrayP[sivCount];
+            sivMaxIndex = sivCount;
+          }
+          sivCount++;
+          if (sivCount >= sivArraySize)
+          {
+            break;
+          }
+        }
+        if ((sivPMinInit == sivPMin) && (sivMaxIndex == sivCount-1))
+        {
+          targetX.put(0);
+          targetY.put(0);
+          Serial.println();
+          Serial.print("All positions similar; set to horiziontal position: (0, 0),");
+        }
+        else
+        {
+          targetX.put(sivArrayX[sivMaxIndex]);
+          targetY.put(sivArrayY[sivMaxIndex]);
+          Serial.println();
+          Serial.print("Optimal position found: (");
+        }
+        Serial.print(sivArrayX[sivMaxIndex]);
+        Serial.print(", ");
+        Serial.print(sivArrayY[sivMaxIndex]);
+        Serial.print("), ");
+        Serial.print(sivArrayN[sivMaxIndex]);
+        Serial.print(" satellites in view, ");
+        Serial.printf("%0.2fm of precision.\n\n", sivArrayP[sivMaxIndex]);
+        sivCount = 0;
+        sivMaxIndex = 0;
+        sivPMin = 10;
+        vTaskDelay(SIV_DELAY*10);
+      }
     }
   }
-}
+#endif
 
 //-------------------------------------------------------
 
@@ -633,8 +640,12 @@ void setup()
   xTaskCreate(task_motor, "Motor Task", 4096, NULL, 8, NULL);
   xTaskCreate(task_gps, "GPS Task", 1024, NULL, 6, NULL);
   xTaskCreate(task_send, "Send Task", 8192, NULL, 4, NULL);
-  xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);
-  xTaskCreate(task_optimize_siv, "Optimize Satellite Pos Task", 4096*2, NULL, 2, NULL);
+
+  #ifdef LEVEL
+    xTaskCreate(task_position, "Position Calculation Task", 1024, NULL, 2, NULL);
+  #else
+    xTaskCreate(task_optimize_siv, "Optimize Satellite Pos Task", 4096*2, NULL, 2, NULL);
+  #endif
 
   Serial.println("Tasks created");
 
