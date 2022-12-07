@@ -477,23 +477,29 @@ void task_send(void* p_params)
 
 #else
   /**
-   * @brief The task used to control the platform's target position over time.
+   * @brief The task used to find the optimal angle for getting a GPS signal.
    * 
    * @param p_params A pointer to optional and unused parameters.
    */
   void task_optimize_siv(void* p_params) 
   {
-    const uint8_t angleRes = 8; // resolution of grid in degrees
-    const uint8_t maxAngle = 18; // maximum angle of device
+    // first, generate a grid of points to cycle through based on system geometry and desired # of points
+    const uint8_t angleRes = 8; // resolution of skygrid in degrees
+    const uint8_t maxAngle = 18; // maximum angle of device (based on geometry of device)
     const uint8_t divCount = maxAngle / angleRes; // number of cells in one direction, rounds down
-    const uint8_t sivArraySize = (2*divCount + 1)*(2*divCount + 1);
+    const uint8_t sivArraySize = (2*divCount + 1)*(2*divCount + 1); // generates an array for all points in grid
 
     int sivArrayX [sivArraySize] = {0}; // creates an array with (2n+1)^2 cells (a divCount of 2 makes 9 squares)
-    int sivArrayY [sivArraySize] = {0};
-    sivArrayX[0] = angleRes * divCount;
-    sivArrayY[0] = angleRes * divCount;
-    int8_t dirFlag = -1;
-    bool flipFlag = true;
+    int sivArrayY [sivArraySize] = {0}; // same as above; these arrays hold X,Y coordinates for each point of skygrid
+    sivArrayX[0] = angleRes * divCount; // put initial value so upcoming for() loop can cycle through
+    sivArrayY[0] = angleRes * divCount; // same as above; start at most positive location 
+    int8_t dirFlag = -1; // flag that flips from positive to negative depending on direction
+    bool flipFlag = true; // flag that tells if you just flipped or not
+
+    // this algorithym generates the path that the platform will follow. it starts at the most positive X,Y location,
+    // then snakes along the current row until it hits its negative-most X point. then, it goes to the next column,
+    // and repeats this pattern (switching direction) until it hits the most negative X,Y location.
+    // note that this is just generating a path using the first two values in this task and isn't actually actuating yet
     for (uint8_t i = 1; i < sivArraySize; i++)
     {
       if ((flipFlag == false) && (abs(sivArrayX[i-1]) == abs (angleRes * divCount)))
@@ -511,25 +517,29 @@ void task_send(void* p_params)
       }
 
     }
-    uint8_t sivCount = 0;
-    uint8_t sivArrayN [sivArraySize] = {0};
-    float sivArrayP [sivArraySize] = {0};
-    // uint8_t sivNMax = 0;
-    float sivPMin = 10;
-    uint8_t sivMaxIndex = 0;
+
+    uint8_t sivCount = 0; // counter variable to cycle through points on grid
+    uint8_t sivArrayN [sivArraySize] = {0}; // array that stores how many satellites are spotted at each point in grid
+    float sivArrayP [sivArraySize] = {0}; // array that stores PDOP value (measurement of precision for GPS) at each point
+    float sivPMin = 10; // sets an arbitrary minimum value at 10 (PDOP values are generally <5, with smaller being better data)
+    uint8_t sivMaxIndex = 0; // index variable that stores where minimum PDOP value was found
     Serial.println("Created array positions");
-    vTaskDelay(5000);
+    vTaskDelay(5000); // wait 5s, for general debugging purposes
+
+    // this is the main task loop 
     while (true)
     {
       if (SIV_TRACKER)
       {
+        // this is the data collection loop. in this loop, the TrackPlat goes to a point in the
+        // grid, hold position ofr a second, then takes data on where it is, how many satellites
+        // it sees, and what the PDOP value is for the location. once the platform reaches the
+        // final value in the grid, it breaks the loop and goes to analyze the data
         while(true)
         {
           targetX.put(sivArrayX[sivCount]);
           targetY.put(sivArrayY[sivCount]);
-          
 
-          
           vTaskDelay(SIV_DELAY);
           sivArrayN[sivCount] = siv.get();
           sivArrayP[sivCount] = dop.get();
@@ -550,13 +560,16 @@ void task_send(void* p_params)
           }
         }
         sivCount = 0;
-        // uint8_t sivNMaxInit = sivArrayN[sivCount];
-        float sivPMinInit = sivArrayP[sivCount];
+        float sivPMinInit = sivArrayP[sivCount]; // notes the initial value of the PDOP array
+
+        // this loop analyzes the PDOP data at each point. if the current PDOP value is less than
+        // the value at the previous point, it has reached a new local minimum and overwrites it.
+        // once the minimum PDOP value has been found (after going through all datapoints), it
+        // exits the loop
         while(true)
         {
           if (sivArrayP[sivCount] <= sivPMin) 
           {
-            // sivNMax = sivArrayN[sivCount];
             sivPMin = sivArrayP[sivCount];
             sivMaxIndex = sivCount;
           }
@@ -566,6 +579,11 @@ void task_send(void* p_params)
             break;
           }
         }
+
+        // if the initial PDOP value (at maximum positive X,Y) is the same as the minimum value
+        // and the index of the minimum value is the final position, then most likely all of the
+        // data for PDOP is the same (or similar enough to not worry). in this case, center the 
+        // platform at 0,0 since position doesn't matter
         if ((sivPMinInit == sivPMin) && (sivMaxIndex == sivCount-1))
         {
           targetX.put(0);
@@ -573,6 +591,9 @@ void task_send(void* p_params)
           Serial.println();
           Serial.print("All positions similar; set to horiziontal position: (0, 0),");
         }
+
+        // otherwise, set the position of the platform to whatever point in the grid contained the
+        // minimum PDOP value
         else
         {
           targetX.put(sivArrayX[sivMaxIndex]);
@@ -590,6 +611,9 @@ void task_send(void* p_params)
         sivCount = 0;
         sivMaxIndex = 0;
         sivPMin = 10;
+        
+        // hold that position for a certain amount of time (can be configured elsewhere), then do
+        // the searching algorythym and data collection again (since satellites move)
         vTaskDelay(SIV_DELAY*10);
       }
     }
